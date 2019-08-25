@@ -16,7 +16,7 @@
     "eject": "react-scripts eject",
     "electron-start": "ELECTRON_START_URL=http://localhost:3000 electron .",
     "dev": "nodemon --exec npm run electron-start",
-    "pack": "electron-builder --dir",
+    "pack": "ELECTRON_START_URL=build/index.html electron-builder --dir",
     "dist": "electron-builder"
   },
   "eslintConfig": {
@@ -48,7 +48,7 @@
     },
     "files": [
       "./build/*",
-      "./main.js"
+      "./public/electron-starter.js"
     ],
     "extends": null,
     "mac": {
