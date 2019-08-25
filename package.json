@@ -4,11 +4,6 @@
   "private": true,
   "main": "public/electron-starter.js",
   "homepage": "./",
-  "dependencies": {
-    "react": "^16.9.0",
-    "react-dom": "^16.9.0",
-    "react-scripts": "3.1.1"
-  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -16,15 +11,21 @@
     "eject": "react-scripts eject",
     "electron-start": "ELECTRON_START_URL=http://localhost:3000 electron .",
     "dev": "nodemon --exec npm run electron-start",
-    "pack": "ELECTRON_START_URL=build/index.html electron-builder --dir",
+    "pack": "electron-builder --dir",
     "dist": "electron-builder"
   },
   "eslintConfig": {
     "extends": "react-app"
   },
+  "dependencies": {
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "react-scripts": "3.1.1"
+  },
   "devDependencies": {
-    "electron": "^6.0.4",
     "electron-builder": "^21.2.0",
+    "electron-debug": "^3.0.1",
+    "electron": "^6.0.4",
     "nodemon": "^1.19.1"
   },
   "browserslist": {
@@ -44,11 +45,13 @@
     "compression": "normal",
     "productName": "CGSM",
     "directories": {
+      "buildResources": "build",
       "output": "dist"
     },
     "files": [
-      "./build/*",
-      "./public/electron-starter.js"
+      "build/**/*",
+      "public/electron-starter.js",
+      "node_modules/**/*"
     ],
     "extends": null,
     "mac": {
