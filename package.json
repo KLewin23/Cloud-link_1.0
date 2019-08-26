@@ -28,7 +28,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "electron-start": "ELECTRON_START_URL=http://localhost:3000 electron .",
+    "electron-start-win": "set ELECTRON_START_URL=http://localhost:3000 && electron .",
     "dev": "nodemon --exec npm run electron-start",
+    "dev-win": "nodemon --exec npm run electron-start-win",
     "pack": "electron-builder --dir",
     "dist": "electron-builder"
   },
