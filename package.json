@@ -5,23 +5,28 @@
   "main": "public/electron-starter.js",
   "homepage": "./",
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.10.2",
+    "@fortawesome/free-solid-svg-icons": "^5.10.2",
     "@material-ui/core": "^4.3.3",
     "@material-ui/icons": "^4.2.1",
     "drivelist": "^8.0.6",
+    "electron": "^6.0.4",
     "os-name": "^3.1.0",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
+    "react-google-button": "^0.5.3",
+    "react-google-login": "^5.0.5",
     "react-redux": "^7.1.0",
     "react-router": "^5.0.1",
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.1.1",
-    "redux": "^4.0.4"
+    "redux": "^4.0.4",
+    "typeface-roboto": "0.0.75"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
     "electron-start": "ELECTRON_START_URL=http://localhost:3000 electron .",
     "dev": "nodemon --exec npm run electron-start",
     "pack": "electron-builder --dir",
@@ -33,8 +38,8 @@
   "devDependencies": {
     "electron-builder": "^21.2.0",
     "electron-debug": "^3.0.1",
-    "electron": "^6.0.4",
-    "nodemon": "^1.19.1"
+    "nodemon": "^1.19.1",
+    "prettier": "1.18.2"
   },
   "browserslist": {
     "production": [
