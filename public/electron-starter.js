@@ -1,6 +1,10 @@
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, ipcMain} = require('electron');
 const path = require('path');
 const url = require('url');
+const os_name = require("os-name");
+const username = require("os").userInfo().username;
+const driveList = require("drivelist");
+const fs = require("fs");
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -26,7 +30,8 @@ function createWindow () {
         slashes: true
     });
     mainWindow.loadURL(startUrl);
-    mainWindow.webContents.openDevTools()
+    mainWindow.webContents.openDevTools();
+    mainWindow.setResizable(false);
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
@@ -50,4 +55,73 @@ app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (mainWindow === null) createWindow()
+});
+
+ipcMain.on("find-drives", (event, arg) => {
+    mainWindow.setSize(470, 820, true);
+    mainWindow.center();
+});
+
+ipcMain.on("main-screen", (event, args) => {
+    mainWindow.setSize(1280, 720, 1);
+    mainWindow.center();
+});
+
+ipcMain.on("reduce", (event, arg) => {
+    mainWindow.setSize(470, 626, true);
+    mainWindow.center();
+});
+
+ipcMain.on("close-window", (event, arg) => {
+    mainWindow.close();
+});
+
+ipcMain.on("minimize", (event, arg) => {
+    mainWindow.minimize();
+});
+
+ipcMain.on("toggle_maximize", (event, arg) => {
+    if (mainWindow.isMaximized()) {
+        mainWindow.unmaximize();
+    } else {
+        mainWindow.maximize();
+    }
+});
+
+ipcMain.on("fill", (event , arg) => {
+    //win.setFullScreen(true)
+    mainWindow.setResizable(true);
+    mainWindow.maximize();
+});
+
+ipcMain.on("getDrives", (event, arg) => {
+    driveList
+        .list()
+        .then(result => {
+            //event.sender.send("returnDrives", result);
+            event.returnValue = result;
+        })
+        .catch(err => {
+            console.log(err);
+        });
+});
+
+ipcMain.on("getOs", (event, arg) => {
+    event.sender.send("returnOs", os_name().toUpperCase());
+});
+
+ipcMain.on("checkLaunchers", (event, arg) => {
+    if (fs.existsSync(arg)) {
+        event.returnValue = ("return", "exists");
+    } else {
+        event.returnValue = ("return", "not exists");
+    }
+});
+
+ipcMain.on("getUsername", (event, arg) => {
+    event.returnValue = username;
+});
+
+ipcMain.on("getFiles", (event, arg) => {
+    event.returnValue = fs.readdirSync(arg);
 });

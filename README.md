@@ -1,5 +1,12 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+
+## Must run
+Every time you install a new package or run npm install you must run 
+    $(npm bin)/electron-rebuild - Mac / Linux
+    ./node_modules/.bin/electron-rebuild - Win
+
+
 ## Available Scripts
 
 In the project directory, you can run:

@@ -10,7 +10,6 @@
     "@material-ui/core": "^4.3.3",
     "@material-ui/icons": "^4.2.1",
     "drivelist": "^8.0.6",
-    "electron": "^6.0.4",
     "os-name": "^3.1.0",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
@@ -40,8 +39,10 @@
   "devDependencies": {
     "electron-builder": "^21.2.0",
     "electron-debug": "^3.0.1",
+    "electron-rebuild": "^1.8.6",
     "nodemon": "^1.19.1",
-    "prettier": "1.18.2"
+    "prettier": "1.18.2",
+    "electron": "^6.0.4"
   },
   "browserslist": {
     "production": [

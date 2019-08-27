@@ -1,24 +1,46 @@
-import React from 'react';
+import React from "react";
 import Logo from "../images/logo.svg";
 import Button from "../componants/Button";
-import {GoogleLogin} from "react-google-login";
+import { GoogleLogin } from "react-google-login";
 import GoogleButton from "react-google-button";
 import { withStyles, createStyles } from "@material-ui/core/styles";
-import {Redirect} from "react-router-dom";
+import { Redirect } from "react-router-dom";
+import {
+    GetFiles,
+    GetOs,
+    GetUsername,
+    ScanDriveGameLaunchers,
+    ScanDrives,
+    SearchComplete
+} from "../scripts";
+import {
+    saveOS,
+    getDrives,
+    setLaunchers,
+    addDriveCheckMessage
+} from "../store/actions";
+import { connect } from "react-redux";
 const { ipcRenderer } = window.require("electron");
-
+//MAKE OWN GOOGLE AUTH CURRENT ONE WILL NOT WORK!!!!!!
 class HomePage extends React.Component {
-    constructor(props){
-        super(props)
+    constructor(props) {
+        super(props);
         this.state = {
             redirect: ""
         };
         this.signIn = this.signIn.bind(this);
     }
-    signIn(){
-        this.setState({redirect: (<Redirect to={"/home"}/>)})
+    signIn() {
+        GetOs()
+            .then(data => this.props.saveOS(data))
+            .then(() => this.props.getDrives(ScanDrives()))
+            .then(() => ScanDriveGameLaunchers(GetUsername(), this.props.app))
+            .then(() => GetFiles(this.props.app, GetUsername()))
+            .then(() => SearchComplete())
+            .then(() => this.setState({ redirect: <Redirect to={"/home"} /> }))
+            .catch(err => console.log(err));
     }
-    render(){
+    render() {
         const classes = this.props.classes;
         return (
             <div className="HomePage">
@@ -28,7 +50,14 @@ class HomePage extends React.Component {
                     className={classes.button}
                     clientId="522213692282-vunu5kbjm3fehg8du5cmltebp8gjrfvt.apps.googleusercontent.com"
                     render={renderProps => (
-                        <GoogleButton type="light" style={{ margin: "auto" }} onClick={renderProps.onClick} disabled={renderProps.disabled}>This is my custom Google button</GoogleButton>
+                        <GoogleButton
+                            type="light"
+                            style={{ margin: "auto" }}
+                            onClick={renderProps.onClick}
+                            disabled={renderProps.disabled}
+                        >
+                            This is my custom Google button
+                        </GoogleButton>
                     )}
                     buttonText="Login"
                     onSuccess={this.signIn}
@@ -36,7 +65,11 @@ class HomePage extends React.Component {
                     cookiePolicy={"single_host_origin"}
                 />
                 <Button
-                    style={{marginLeft: "50%", marginTop:"20px", transform: "translateX(-50%)"}}
+                    style={{
+                        marginLeft: "50%",
+                        marginTop: "20px",
+                        transform: "translateX(-50%)"
+                    }}
                     type="contained"
                     width="245px"
                     height="50px"
@@ -71,8 +104,24 @@ const styles = theme =>
             marginLeft: "50%",
             transform: "translateX(-50%)",
             height: "180px",
-            margin:"auto"
-        },
+            margin: "auto"
+        }
     });
 
-export default withStyles(styles)(HomePage)
+const mapStateToProps = state => {
+    return {
+        app: state.appReducer,
+        scanner: state.scannerReducer
+    };
+};
+
+const mapDispatchToProps = {
+    saveOS,
+    getDrives,
+    setLaunchers,
+    addDriveCheckMessage
+};
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(withStyles(styles)(HomePage));
