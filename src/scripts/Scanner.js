@@ -47,7 +47,6 @@ export function ScanDriveGameLaunchers(username, app) {
 }
 
 function CheckLocationExistence(path, launcher) {
-    console.log({path,launcher});
     const value = ipcRenderer.sendSync("checkLaunchers", path);
     if (value === "exists") {
         store.dispatch(setLaunchers([launcher, path]));
@@ -106,6 +105,6 @@ export function GetFiles(app, username) {
 }
 
 export function SearchComplete(username) {
-    console.log(ipcRenderer.sendSync("checkLaunchers",`/Users/UNAME/Library/Application\ Support/Steam/steamapps/common/`.replace("UNAME",username)));
+    //console.log(ipcRenderer.sendSync("checkLaunchers",`/Users/UNAME/Library/Application\ Support/Steam/steamapps/common/`.replace("UNAME",username)));
     ipcRenderer.send("fill");
 }

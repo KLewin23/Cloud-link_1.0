@@ -1,7 +1,6 @@
 import React from "react";
 import Logo from "../images/logo.svg";
 import Button from "../componants/Button";
-import { GoogleLogin } from "react-google-login";
 import GoogleButton from "react-google-button";
 import { withStyles, createStyles } from "@material-ui/core/styles";
 import { Redirect } from "react-router-dom";
@@ -20,8 +19,10 @@ import {
     addDriveCheckMessage
 } from "../store/actions";
 import { connect } from "react-redux";
+
+const request = require("request");
 const { ipcRenderer } = window.require("electron");
-//MAKE OWN GOOGLE AUTH CURRENT ONE WILL NOT WORK!!!!!!
+
 class HomePage extends React.Component {
     constructor(props) {
         super(props);
@@ -36,7 +37,28 @@ class HomePage extends React.Component {
             .then(() => this.props.getDrives(ScanDrives()))
             .then(() => ScanDriveGameLaunchers(GetUsername(), this.props.app))
             .then(() => GetFiles(this.props.app, GetUsername()))
-            .then(() => SearchComplete())
+            .then(() => {
+                const auth = ipcRenderer.sendSync("Authenticate");
+                console.log(auth.access_token);
+                request(
+                    {
+                        method: "get",
+                        uri: "https://www.googleapis.com/userinfo/v2/me",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${auth.access_token}`
+                        }
+                    },
+                    function(err, response, body) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            console.log(body);
+                        }
+                    }
+                );
+            })
+            //.then(() => SearchComplete())
             .then(() => this.setState({ redirect: <Redirect to={"/home"} /> }))
             .catch(err => console.log(err));
     }
@@ -46,24 +68,14 @@ class HomePage extends React.Component {
             <div className="HomePage">
                 {this.state.redirect}
                 <img src={Logo} alt="xx" className={classes.logo} />
-                <GoogleLogin
-                    className={classes.button}
-                    clientId="522213692282-vunu5kbjm3fehg8du5cmltebp8gjrfvt.apps.googleusercontent.com"
-                    render={renderProps => (
-                        <GoogleButton
-                            type="light"
-                            style={{ margin: "auto" }}
-                            onClick={renderProps.onClick}
-                            disabled={renderProps.disabled}
-                        >
-                            This is my custom Google button
-                        </GoogleButton>
-                    )}
-                    buttonText="Login"
-                    onSuccess={this.signIn}
-                    onFailure={""}
-                    cookiePolicy={"single_host_origin"}
-                />
+
+                <GoogleButton
+                    type="light"
+                    style={{ margin: "auto" }}
+                    onClick={this.signIn}
+                >
+                    This is my custom Google button
+                </GoogleButton>
                 <Button
                     style={{
                         marginLeft: "50%",
