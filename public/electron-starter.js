@@ -22,7 +22,8 @@ function createWindow() {
             nodeIntegration: true
         },
         autoHideMenuBar: true,
-        center: true
+        center: true,
+        frame: false
     });
 
     // and load the index.html of the app.
