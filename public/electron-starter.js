@@ -9,14 +9,17 @@ const OAuth2Client = require("google-auth-library").OAuth2Client;
 const http = require("http");
 const destroyer = require("server-destroy");
 const fp = require("find-free-port");
+const dialog = require("electron").dialog;
 
 let mainWindow;
 
 function createWindow() {
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width: 470,
-        height: 626,
+        // width: 470,
+        // height: 626,
+        width: 1280,
+        height: 720,
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
             nodeIntegration: true
@@ -60,11 +63,6 @@ app.on("activate", function() {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (mainWindow === null) createWindow();
-});
-
-ipcMain.on("find-drives", (event, arg) => {
-    mainWindow.setSize(470, 820, true);
-    mainWindow.center();
 });
 
 ipcMain.on("main-screen", (event, args) => {
@@ -137,19 +135,15 @@ ipcMain.on("Authenticate", (event, arg) => {
         .catch(err => console.log(err));
 });
 
-// function getPort(){
-//     const portTest = Math.floor(Math.random() * (60000 - 4000) + 4000);
-//     detect(portTest, (err, _port) => {
-//         if (err) {
-//             console.log(err);
-//         }
-//         if (portTest === _port) {
-//             return portTest
-//         } else {
-//             return "Fail"
-//         }
-//     });
-// }
+ipcMain.on("getFolder", event => {
+    dialog.showOpenDialog(
+        null,
+        { properties: ["openDirectory"] },
+        filePaths => {
+            event.sender.send("returnFolder", filePaths);
+        }
+    );
+});
 
 function getAuthenticatedUser() {
     return new Promise((resolve, reject) => {

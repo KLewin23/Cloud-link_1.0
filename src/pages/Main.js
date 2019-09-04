@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
+import { createStyles, makeStyles, withStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
@@ -41,43 +41,8 @@ function a11yProps(index) {
     };
 }
 
-const useStyles = makeStyles(theme => ({
-    root: {
-        flexGrow: 1,
-        backgroundColor: theme.palette.background.paper
-    },
-    appBar: {
-        backgroundColor: "#202020"
-    }
-}));
-
-const StyledTabs = withStyles({
-    indicator: {
-        display: "flex",
-        justifyContent: "center",
-        backgroundColor: "transparent",
-        "& > div": {
-            width: "100%",
-            backgroundColor: "white"
-        }
-    }
-})(props => <Tabs {...props} TabIndicatorProps={{ children: <div /> }} />);
-
-const StyledTab = withStyles(theme => ({
-    root: {
-        textTransform: "none",
-        color: "#fff",
-        fontWeight: theme.typography.fontWeightRegular,
-        fontSize: theme.typography.pxToRem(15),
-        marginRight: theme.spacing(1),
-        "&:focus": {
-            opacity: 1
-        }
-    }
-}))(props => <Tab disableRipple {...props} />);
-
 function SimpleTabs(props) {
-    const classes = useStyles();
+    const classes = props.classes;
     const [value, setValue] = React.useState(0);
 
     function handleChange(event, newValue) {
@@ -91,6 +56,7 @@ function SimpleTabs(props) {
                     value={value}
                     onChange={handleChange}
                     aria-label="simple tabs example"
+                    style={{height: "100%"}}
                 >
                     <StyledTab label="Home" {...a11yProps(0)} />
                     <StyledTab label="Your Machine" {...a11yProps(1)} />
@@ -126,6 +92,41 @@ function SimpleTabs(props) {
     );
 }
 
+const StyledTabs = withStyles({
+    indicator: {
+        display: "flex",
+        justifyContent: "center",
+        backgroundColor: "transparent",
+        "& > div": {
+            width: "100%",
+            backgroundColor: "white"
+        }
+    }
+})(props => <Tabs {...props} TabIndicatorProps={{ children: <div /> }} />);
+
+const StyledTab = withStyles(theme => ({
+    root: {
+        textTransform: "none",
+        color: "#fff",
+        fontWeight: theme.typography.fontWeightRegular,
+        fontSize: theme.typography.pxToRem(15),
+        marginRight: theme.spacing(1),
+        "&:focus": {
+            opacity: 1
+        }
+    }
+}))(props => <Tab disableRipple {...props} />);
+
+const styles = createStyles(theme => ({
+    root: {
+        flexGrow: 1,
+        backgroundColor: theme.palette.background.paper
+    },
+    appBar: {
+        backgroundColor: "#202020"
+    }
+}));
+
 const mapStateToProps = state => {
     return {
         app: state.appReducer,
@@ -139,4 +140,4 @@ const mapDispatchToProps = {
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(SimpleTabs);
+)(withStyles(styles)(SimpleTabs));

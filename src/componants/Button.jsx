@@ -53,7 +53,7 @@ export default function CustomButton({
         buttonIcon = (
             <img
                 src={BoxLogo}
-                alt="xx"
+                alt="yy"
                 style={{ height: "20px", alignContent: "flex-start" ,marginRight: '30px' }}
             />
         );

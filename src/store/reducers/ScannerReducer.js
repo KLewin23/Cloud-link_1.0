@@ -11,13 +11,11 @@ export default (state = initialState, action) => {
       var message = action.payload.message
       var curProgMessages = state.progressMessages
       curProgMessages[launcher] = message
-      state = {
+      return {
         ...state,
         progressMessages: curProgMessages,
       };
-      break;
     default:
-      return initialState;
+      return state;
   }
-  return state;
 };

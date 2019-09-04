@@ -106,5 +106,5 @@ export function GetFiles(app, username) {
 
 export function SearchComplete(username) {
     //console.log(ipcRenderer.sendSync("checkLaunchers",`/Users/UNAME/Library/Application\ Support/Steam/steamapps/common/`.replace("UNAME",username)));
-    ipcRenderer.send("fill");
+    //ipcRenderer.send("fill");
 }

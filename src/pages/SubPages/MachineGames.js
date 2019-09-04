@@ -2,18 +2,20 @@ import React from "react";
 import { withStyles, createStyles } from "@material-ui/core/styles";
 import { GridList } from "@material-ui/core";
 import Tile from "../../componants/Tile";
+import Modal from '../../componants/ModifyGameModal'
+import {connect} from 'react-redux'
+import { openModal } from "../../store/actions";
 
 function MachineTab(props) {
-    const classes = props.classes
-
-    console.log(props.games)
+    const classes = props.classes;
 
     const games = Object.keys(props.games).map((game)=>(
-        <Tile title={game} location={props.games[game]}/>
-    ))
+        <Tile key={game} title={game} open={props.openModal} location={props.games[game]}/>
+    ));
 
     return (
         <div style={{margin: "auto"}}>
+            <Modal />
             <GridList className={classes.list}>
                 {games}
             </GridList>
@@ -28,4 +30,15 @@ const styles = theme =>
         }
     });
 
-export default withStyles(styles)(MachineTab)
+const mapStateToProps = state => {
+    return {
+        modal: state.GameModalReducer
+    };
+};
+const mapDispatchToProps = {
+    openModal
+};
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(withStyles(styles)(MachineTab));

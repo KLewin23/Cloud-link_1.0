@@ -70,8 +70,8 @@ export default (state = initialState, action) => {
                 drives: action.payload
             };
         case SETLAUNCHERS:
-            var curLaunchers = state.launchers
-            curLaunchers.push([action.payload[0],action.payload[1]])
+            const curLaunchers = state.launchers
+            curLaunchers.push([action.payload[0],action.payload[1]]);
             return {
                 ...state,
                 launchers: curLaunchers
@@ -80,8 +80,8 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 gamePaths: action.payload
-            }
+            };
         default:
-            return initialState;
+            return state;
     }
 };
