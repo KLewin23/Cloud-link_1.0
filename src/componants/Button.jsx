@@ -20,6 +20,7 @@ export default function CustomButton({
     justify,
     textTrans,
     fontSize,
+    top
 }) {
     function variant(type) {
         switch (type) {
@@ -61,7 +62,7 @@ export default function CustomButton({
 
    function marginFunc() {
         if(margin === "special"){
-            return "20px 0px 20px 50%";
+            return `${top} 0px 20px 50%`;
         } else {
             return margin
         }

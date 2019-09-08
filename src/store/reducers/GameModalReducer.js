@@ -50,7 +50,6 @@ export default (state = initialState, action) => {
                 newPath: action.payload
             };
         default:
-            console.log(state)
             return state;
     }
 };

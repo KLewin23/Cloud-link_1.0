@@ -83,6 +83,7 @@ class HomePage extends React.Component {
                         marginTop: "20px",
                         transform: "translateX(-50%)"
                     }}
+                    top={"20px"}
                     type="contained"
                     width="245px"
                     height="50px"

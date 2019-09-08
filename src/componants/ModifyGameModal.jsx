@@ -13,7 +13,7 @@ const Fade = React.forwardRef(function Fade(props, ref) {
     const { in: open, children, onEnter, onExited, ...other } = props;
     const style = useSpring({
         from: { opacity: 0 },
-        to: { opacity: open ? 1 : 0 },
+        to: { opacity: open ? 1 : 0, outline: "none" },
         onStart: () => {
             if (open && onEnter) {
                 onEnter();
@@ -74,7 +74,7 @@ function ModifyGameModal(props) {
                             <SetLocation location={props.modal.currentPath} />
                         </Grid>
                         <Grid item>
-                            <CustomButton click={setLocationFinish} type={"contained"} color={"black"} text={"Save"} width={"200px"} height={"80px"}/>
+                            <CustomButton click={setLocationFinish} top={"50px"} justify={"center"} margin={"special"} textColor={"white"} type={"contained"} color={"black"} text={"Save"} width={"150px"} height={"40px"}/>
                         </Grid>
                     </Grid>
                 </div>
@@ -89,12 +89,14 @@ const styles = theme =>
             width: 400,
             height: 600,
             backgroundColor: "white",
-            padding: theme.spacing(2, 4, 3)
+            padding: theme.spacing(2, 4, 3),
+            outline: "none"
         },
         modal: {
             display: "flex",
             alignItems: "center",
-            justifyContent: "center"
+            justifyContent: "center",
+            outline: "none"
         },
         image:{
             height:"200px"
