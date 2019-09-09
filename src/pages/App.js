@@ -13,7 +13,7 @@ class App extends React.Component {
                 resolve();
             }, 3000);
         }).then((value)=>{
-            this.setState({comp: <Redirect to={"/home"}/>})
+            this.setState({comp: <Redirect to={"/"}/>})
         })
     }
     render() {

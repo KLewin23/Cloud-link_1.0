@@ -30,11 +30,12 @@ class HomePage extends React.Component {
             redirect: ""
         };
         this.signIn = this.signIn.bind(this);
-        this.signIn()
     }
     signIn() {
         GetOs()
+            //.then((data) => console.log(data))
             .then(data => this.props.saveOS(data))
+
             .then(() => this.props.getDrives(ScanDrives()))
             .then(() => ScanDriveGameLaunchers(GetUsername(), this.props.app))
             .then(() => GetFiles(this.props.app, GetUsername()))

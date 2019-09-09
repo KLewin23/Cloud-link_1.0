@@ -9,12 +9,4 @@ export const sysLaunchers = {
     LIN:{
 
     }
-}
-
-export const lancherImg = {
-    STEAM: "",
-    ORIGIN: "",
-    BLIZZARD: "",
-    EPIC: "",
-    ACTIVISION: ""
-}
+};

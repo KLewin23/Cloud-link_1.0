@@ -19,13 +19,6 @@ export function ScanDriveGameLaunchers(username, app) {
         app.drives.forEach(drive => {
             if (drive.mountpoints[0] !== undefined) {
                 Object.keys(launchers).forEach(launcher => {
-
-                    console.log(launchers[launcher].replace(
-                        "DRIVE",
-                        drive.mountpoints[0].path
-                    ));
-                    console.log(launcher);
-
                     CheckLocationExistence(
                         launchers[launcher].replace(
                             "DRIVE",
@@ -54,16 +47,16 @@ function CheckLocationExistence(path, launcher) {
 }
 
 export function GetOs() {
-
     return new Promise((resolve, reject) => {
         ipcRenderer.send("getOs");
         ipcRenderer.on("returnOs", function(even, data) {
+            console.log(data)
             if (data.includes("MACOS")) {
                 resolve("MAC");
             } else if (data.includes("WIN")) {
                 resolve("WIN");
             } else {
-                reject();
+                reject()
             }
         });
     });
@@ -81,13 +74,15 @@ export function GetFiles(app, username) {
             .filter(i => !i.startsWith("."));
         return {
             ...acc,
-            [launcher[0]]: [value]
+            [launcher[0]]: value
         };
     }, {});
+    console.log(installedGames);
     Object.keys(installedGames).forEach(launcher => {
         const gamePaths = installedGames[launcher].reduce(
             (acc, installedGame) => {
-                const game = installedGames[launcher]
+                console.log(acc);
+                const game = installedGame
                     .toString()
                     .toLowerCase();
                 const GamesSys = Games[app.os][launcher];
@@ -96,15 +91,19 @@ export function GetFiles(app, username) {
                         ...acc,
                         [game]: GamesSys[game]
                     };
+                } else {
+                    return {...acc}
                 }
             },
             {}
         );
+        console.log(gamePaths);
         store.dispatch(setGamePaths(gamePaths));
     });
 }
 
 export function SearchComplete(username) {
     //console.log(ipcRenderer.sendSync("checkLaunchers",`/Users/UNAME/Library/Application\ Support/Steam/steamapps/common/`.replace("UNAME",username)));
+    ipcRenderer.send("main-screen");
     //ipcRenderer.send("fill");
 }

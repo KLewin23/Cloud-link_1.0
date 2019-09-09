@@ -1,15 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { createStyles, makeStyles, withStyles } from "@material-ui/core/styles";
-import AppBar from "@material-ui/core/AppBar";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
-import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
 import HomeTab from "./SubPages/Home";
 import CloudTab from "./SubPages/Cloud";
 import MachineTab from "./SubPages/MachineGames";
 import { connect } from "react-redux";
+import { SettingsApplicationsSharp, AddCircleOutline } from "@material-ui/icons"
+import { IconButton, Typography, Tab, Tabs, AppBar, Tooltip } from "@material-ui/core";
+import Grid from "@material-ui/core/Grid";
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -61,7 +60,20 @@ function SimpleTabs(props) {
                     <StyledTab label="Home" {...a11yProps(0)} />
                     <StyledTab label="Your Machine" {...a11yProps(1)} />
                     <StyledTab label="Cloud" {...a11yProps(2)} />
+
                 </StyledTabs>
+                <div className={classes.controls}>
+                    <Tooltip title={"Add Game"}>
+                        <IconButton >
+                            <AddCircleOutline className={classes.settings}/>
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={"Settings"}>
+                        <IconButton style={{marginLeft: "20px"}}>
+                            <SettingsApplicationsSharp className={classes.settings}/>
+                        </IconButton>
+                    </Tooltip>
+                </div>
             </AppBar>
             <TabPanel
                 value={value}
@@ -124,6 +136,14 @@ const styles = createStyles(theme => ({
     },
     appBar: {
         backgroundColor: "#202020"
+    },
+    settings: {
+        color: "white"
+    },
+    controls:{
+        position: "absolute",
+        display: "inline-block",
+        right: "100px"
     }
 }));
 

@@ -38,6 +38,9 @@ function SetLocation(props) {
             value={values.location}
             onChange={handleChange("password")}
             style={{ marginTop: "30px", width: "100%" }}
+            InputLabelProps={{
+                shrink: true,
+            }}
             InputProps={{
                 endAdornment: (
                     <InputAdornment position="end">
