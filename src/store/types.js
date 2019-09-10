@@ -14,6 +14,8 @@ export const CHANGE_TITLE = "CHANGE_TITLE";
 export const SET_GAME = "SET_GAME";
 export const SET_PATH = "SET_PATH";
 export const SET_NEW_PATH = "SET_NEW_PATH";
+export const OPEN_ADD_GAME_MODEL = "OPEN_ADD_GAME_MODEL";
+export const CLOSE_ADD_GAME_MODEL = "CLOSE_ADD_GAME_MODEL";
 
 
 // settings

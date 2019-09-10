@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { createStyles, makeStyles, withStyles } from "@material-ui/core/styles";
+import { createStyles, withStyles } from "@material-ui/core/styles";
 import Box from "@material-ui/core/Box";
 import HomeTab from "./SubPages/Home";
 import CloudTab from "./SubPages/Cloud";
@@ -8,7 +8,8 @@ import MachineTab from "./SubPages/MachineGames";
 import { connect } from "react-redux";
 import { SettingsApplicationsSharp, AddCircleOutline } from "@material-ui/icons"
 import { IconButton, Typography, Tab, Tabs, AppBar, Tooltip } from "@material-ui/core";
-import Grid from "@material-ui/core/Grid";
+import { openAddGame } from "../store/actions";
+import Modal from '../componants/AddGameModal'
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -50,6 +51,7 @@ function SimpleTabs(props) {
 
     return (
         <div className={classes.root}>
+            <Modal />
             <AppBar position="static" className={classes.appBar}>
                 <StyledTabs
                     value={value}
@@ -64,7 +66,7 @@ function SimpleTabs(props) {
                 </StyledTabs>
                 <div className={classes.controls}>
                     <Tooltip title={"Add Game"}>
-                        <IconButton >
+                        <IconButton  onClick={props.openAddGame}>
                             <AddCircleOutline className={classes.settings}/>
                         </IconButton>
                     </Tooltip>
@@ -155,7 +157,7 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = {
-
+    openAddGame
 };
 export default connect(
     mapStateToProps,

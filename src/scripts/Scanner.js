@@ -50,13 +50,13 @@ export function GetOs() {
     return new Promise((resolve, reject) => {
         ipcRenderer.send("getOs");
         ipcRenderer.on("returnOs", function(even, data) {
-            console.log(data)
+            console.log(data);
             if (data.includes("MACOS")) {
                 resolve("MAC");
             } else if (data.includes("WIN")) {
                 resolve("WIN");
             } else {
-                reject()
+                reject();
             }
         });
     });
@@ -82,28 +82,18 @@ export function GetFiles(app, username) {
         const gamePaths = installedGames[launcher].reduce(
             (acc, installedGame) => {
                 console.log(acc);
-                const game = installedGame
-                    .toString()
-                    .toLowerCase();
+                const game = installedGame.toString().toLowerCase();
                 const GamesSys = Games[app.os][launcher];
-                if (game in GamesSys) {
-                    return {
-                        ...acc,
-                        [game]: GamesSys[game]
-                    };
-                } else {
-                    return {...acc}
-                }
+                return game in GamesSys
+                    ? { ...acc, [game]: GamesSys[game] }
+                    : { ...acc };
             },
             {}
         );
-        console.log(gamePaths);
         store.dispatch(setGamePaths(gamePaths));
     });
 }
 
 export function SearchComplete(username) {
-    //console.log(ipcRenderer.sendSync("checkLaunchers",`/Users/UNAME/Library/Application\ Support/Steam/steamapps/common/`.replace("UNAME",username)));
     ipcRenderer.send("main-screen");
-    //ipcRenderer.send("fill");
 }
