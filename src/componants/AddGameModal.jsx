@@ -1,10 +1,12 @@
 import React from "react";
 import { withStyles, createStyles } from "@material-ui/core/styles";
-import { Modal } from "@material-ui/core";
+import { IconButton, Modal, Tooltip } from "@material-ui/core";
 import { closeModal, setGamePaths, setPath } from "../store/actions";
 import { connect } from "react-redux";
 import { openAddGame, closeAddGame} from "../store/actions";
 import Backdrop from "@material-ui/core/Backdrop";
+import SetLocation from "./SetLocation";
+import { AddCircleOutline, AddPhotoAlternate } from "@material-ui/icons";
 
 function AddGameModal(props) {
     const classes = props.classes;
@@ -23,7 +25,16 @@ function AddGameModal(props) {
                 timeout: 500
             }}
         >
-            <h1>xx</h1>
+            <div className={classes.paper}>
+                <div className={classes.imagePlaceholder}>
+                    <Tooltip title={"Add Image"}>
+                        <IconButton  onClick={props.openAddGame}>
+                            <AddPhotoAlternate/>
+                        </IconButton>
+                    </Tooltip>
+                </div>
+                <SetLocation/>
+            </div>
         </Modal>
     );
 }
@@ -44,6 +55,16 @@ const styles = createStyles(theme => ({
     },
     image: {
         height: "200px"
+    },
+    imagePlaceholder:{
+        height: 230,
+        width: 180,
+        backgroundColor: "#f0f0f0",
+        "& button": {
+            marginLeft: "50%",
+            transform: "translateX(-50%)",
+            marginTop: "50%"
+        }
     }
 }));
 

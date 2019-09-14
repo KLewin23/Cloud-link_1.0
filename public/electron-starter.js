@@ -111,7 +111,7 @@ ipcMain.on("getOs", (event, arg) => {
     event.sender.send("returnOs", os_name().toUpperCase());
 });
 
-ipcMain.on("checkLaunchers", (event, arg) => {
+ipcMain.on("checkLocationExists", (event, arg) => {
     if (fs.existsSync(arg)) {
         event.returnValue = ("return", "exists");
     } else {
@@ -141,6 +141,20 @@ ipcMain.on("getFolder", event => {
             event.sender.send("returnFolder", filePaths);
         }
     );
+});
+
+ipcMain.on("createFile", (event , arg) => {
+    fs.appendFile(arg.name, arg.contents, function(err){
+        if (err) throw err;
+        event.returnValue = "success"
+    })
+});
+
+ipcMain.on("overwriteFile", (event , arg) => {
+    fs.writeFile(arg.name,arg.contents, function(err){
+        if (err) throw err;
+        event.returnValue = "success"
+    })
 });
 
 function getAuthenticatedUser() {

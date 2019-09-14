@@ -16,6 +16,8 @@ export const SET_PATH = "SET_PATH";
 export const SET_NEW_PATH = "SET_NEW_PATH";
 export const OPEN_ADD_GAME_MODEL = "OPEN_ADD_GAME_MODEL";
 export const CLOSE_ADD_GAME_MODEL = "CLOSE_ADD_GAME_MODEL";
+export const CONFIG_ADD_GAME = "CONFIG_ADD_GAME";
+export const SET_CONFIG_FILE_PATH = "SET_CONFIG_FILE_PATH";
 
 
 // settings

@@ -19,6 +19,9 @@ import {
     addDriveCheckMessage
 } from "../store/actions";
 import { connect } from "react-redux";
+import {
+    ConfigMain
+} from '../scripts/ConfigHandler'
 
 const request = require("request");
 const { ipcRenderer } = window.require("electron");
@@ -62,6 +65,7 @@ class HomePage extends React.Component {
             // })
             .then(() => SearchComplete())
             .then(() => this.setState({ redirect: <Redirect to={"/home"} /> }))
+            .then(() => ConfigMain(this.props.app,GetUsername()))
             .catch(err => console.log(err));
     }
     render() {

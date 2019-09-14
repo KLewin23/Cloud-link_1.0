@@ -1,9 +1,8 @@
 import store from "../store";
 import { setLaunchers } from "../store/actions";
 import { setGamePaths } from "../store/actions";
-import { GameSavePaths as Games } from "./Games";
-import { sysLaunchers as Launchers } from "./Launchers";
-import { toggleFullscreen } from "../store/actions/appActions";
+import { GameSavePaths as Games } from "../Config/Games";
+import { sysLaunchers as Launchers } from "../Config/Launchers";
 import { sendLocation } from "../store/actions";
 const { ipcRenderer } = window.require("electron");
 
@@ -40,7 +39,7 @@ export function ScanDriveGameLaunchers(username, app) {
 }
 
 function CheckLocationExistence(path, launcher) {
-    const value = ipcRenderer.sendSync("checkLaunchers", path);
+    const value = ipcRenderer.sendSync("checkLocationExists", path);
     if (value === "exists") {
         store.dispatch(setLaunchers([launcher, path]));
     }
@@ -50,7 +49,6 @@ export function GetOs() {
     return new Promise((resolve, reject) => {
         ipcRenderer.send("getOs");
         ipcRenderer.on("returnOs", function(even, data) {
-            console.log(data);
             if (data.includes("MACOS")) {
                 resolve("MAC");
             } else if (data.includes("WIN")) {
@@ -77,11 +75,9 @@ export function GetFiles(app, username) {
             [launcher[0]]: value
         };
     }, {});
-    console.log(installedGames);
     Object.keys(installedGames).forEach(launcher => {
         const gamePaths = installedGames[launcher].reduce(
             (acc, installedGame) => {
-                console.log(acc);
                 const game = installedGame.toString().toLowerCase();
                 const GamesSys = Games[app.os][launcher];
                 return game in GamesSys

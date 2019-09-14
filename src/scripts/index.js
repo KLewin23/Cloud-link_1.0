@@ -1,4 +1,3 @@
 export * from './Scanner'
-export * from './Launchers.js'
-export * from './Sleep'
-export * from './Games'
+export * from '../Config/Launchers.js'
+export * from './functions/Sleep'

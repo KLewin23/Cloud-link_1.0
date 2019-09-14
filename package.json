@@ -1,5 +1,5 @@
 {
-  "name": "cgsm",
+  "name": "CloudGameSaveManager",
   "version": "0.1.0",
   "private": true,
   "main": "public/electron-starter.js",

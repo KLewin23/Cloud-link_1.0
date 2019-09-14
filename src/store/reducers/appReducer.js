@@ -6,10 +6,16 @@ import {
     SAVEOS,
     GETDRIVES,
     SETLAUNCHERS,
-    SET_GAME_PATHS
+    SET_GAME_PATHS,
+    CONFIG_ADD_GAME,
+    SET_CONFIG_FILE_PATH
 } from "../types";
 
-var initialState = {
+const initialState = {
+    config: {
+        filePath: "",
+        games: {}
+    },
     fullscreen: 0,
     loggedIn: 0,
     email: "",
@@ -80,6 +86,25 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 gamePaths: action.payload
+            };
+        case CONFIG_ADD_GAME:
+            return {
+                ...state,
+                config:{
+                    ...state.config,
+                    games:{
+                        ...state.config.games,
+                        [action.payload.name]: action.payload.path
+                    }
+                }
+            };
+        case SET_CONFIG_FILE_PATH:
+            return {
+                ...state,
+                config:{
+                    ...state.config,
+                    filePath: action.payload
+                }
             };
         default:
             return state;
