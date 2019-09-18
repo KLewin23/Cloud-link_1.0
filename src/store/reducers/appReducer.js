@@ -8,13 +8,22 @@ import {
     SETLAUNCHERS,
     SET_GAME_PATHS,
     CONFIG_ADD_GAME,
-    SET_CONFIG_FILE_PATH
+    SET_CONFIG_FILE_PATH,
+    SET_BASE_CONFIG,
+    SET_CONFIG_GAMES,
+    CHANGE_CONFIG_GAME_PATH,
+    SET_IMAGE_CONFIG_PATH,
+    ADD_NEW_GAME
 } from "../types";
+import { updateFile } from '../../scripts/ConfigHandler'
+import  { GetUsername } from '../../scripts/Scanner'
 
 const initialState = {
     config: {
         filePath: "",
-        games: {}
+        imagePath: "",
+        games: {},
+        images: {}
     },
     fullscreen: 0,
     loggedIn: 0,
@@ -76,8 +85,8 @@ export default (state = initialState, action) => {
                 drives: action.payload
             };
         case SETLAUNCHERS:
-            const curLaunchers = state.launchers
-            curLaunchers.push([action.payload[0],action.payload[1]]);
+            const curLaunchers = state.launchers;
+            curLaunchers.push([action.payload[0], action.payload[1]]);
             return {
                 ...state,
                 launchers: curLaunchers
@@ -88,6 +97,57 @@ export default (state = initialState, action) => {
                 gamePaths: action.payload
             };
         case CONFIG_ADD_GAME:
+            updateFile({
+                ...state,
+                config: {
+                    ...state.config,
+                    games: {
+                        ...state.config.games,
+                        [action.payload.name]: action.payload.path
+                    }
+                }
+            },GetUsername());
+            return {
+                ...state,
+                config: {
+                    ...state.config,
+                    games: {
+                        ...state.config.games,
+                        [action.payload.name]: action.payload.path
+                    }
+                }
+            };
+        case SET_CONFIG_FILE_PATH:
+            return {
+                ...state,
+                config: {
+                    filePath: action.payload
+                }
+            };
+        case SET_BASE_CONFIG:
+            return {
+                ...state,
+                config: JSON.parse(action.payload)
+            };
+        case SET_CONFIG_GAMES:
+            return {
+                ...state,
+                config:{
+                    ...state.config,
+                    games: action.payload
+                }
+            };
+        case CHANGE_CONFIG_GAME_PATH:
+            updateFile({
+                ...state,
+                config:{
+                    ...state.config,
+                    games:{
+                        ...state.config.games,
+                        [action.payload.name]: action.payload.path
+                    }
+                }
+            },GetUsername());
             return {
                 ...state,
                 config:{
@@ -98,12 +158,57 @@ export default (state = initialState, action) => {
                     }
                 }
             };
-        case SET_CONFIG_FILE_PATH:
+        case SET_IMAGE_CONFIG_PATH:
+            updateFile({
+                ...state,
+                config:{
+                    ...state.config,
+                    imagePath: action.payload
+                }
+            },GetUsername());
             return {
                 ...state,
                 config:{
                     ...state.config,
-                    filePath: action.payload
+                    imagePath: action.payload,
+
+                }
+            };
+        case ADD_NEW_GAME:
+            updateFile({
+                ...state,
+                config:{
+                    ...state.config,
+                    games: {
+                        ...state.config.games,
+                        [action.payload.name]: action.payload.path
+                    },
+                    images : {
+                        ...state.config.images,
+                        [action.payload.name]: action.payload.image
+                    }
+                },
+                gamePaths: {
+                    ...state.gamePaths,
+                    [action.payload.name]: action.payload.path
+                }
+            },GetUsername());
+            return {
+                ...state,
+                config:{
+                    ...state.config,
+                    games: {
+                        ...state.config.games,
+                        [action.payload.name]: action.payload.path
+                    },
+                    images : {
+                        ...state.config.images,
+                        [action.payload.name]: action.payload.image
+                    }
+                },
+                gamePaths: {
+                    ...state.gamePaths,
+                    [action.payload.name]: action.payload.path
                 }
             };
         default:

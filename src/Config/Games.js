@@ -11,7 +11,8 @@ export const GameSavePaths ={
     },
     MAC : {
         steam:{
-            "orwell": "/Users/UNAME/Desktop/jamesstuff"
+            "orwell": "/Users/UNAME/Desktop/jamesstuff",
+            "anygame": "/Users/UNAME/Desktop"
         },
         origin:{
 

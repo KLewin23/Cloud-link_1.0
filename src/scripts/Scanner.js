@@ -3,7 +3,6 @@ import { setLaunchers } from "../store/actions";
 import { setGamePaths } from "../store/actions";
 import { GameSavePaths as Games } from "../Config/Games";
 import { sysLaunchers as Launchers } from "../Config/Launchers";
-import { sendLocation } from "../store/actions";
 const { ipcRenderer } = window.require("electron");
 
 export function ScanDrives() {
@@ -70,6 +69,7 @@ export function GetFiles(app, username) {
         const value = ipcRenderer
             .sendSync("getFiles", path)
             .filter(i => !i.startsWith("."));
+        console.log(value);
         return {
             ...acc,
             [launcher[0]]: value
@@ -80,6 +80,7 @@ export function GetFiles(app, username) {
             (acc, installedGame) => {
                 const game = installedGame.toString().toLowerCase();
                 const GamesSys = Games[app.os][launcher];
+                console.log(game)
                 return game in GamesSys
                     ? { ...acc, [game]: GamesSys[game] }
                     : { ...acc };

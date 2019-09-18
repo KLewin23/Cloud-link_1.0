@@ -19,9 +19,7 @@ import {
     addDriveCheckMessage
 } from "../store/actions";
 import { connect } from "react-redux";
-import {
-    ConfigMain
-} from '../scripts/ConfigHandler'
+import { ConfigMain } from "../scripts/ConfigHandler";
 
 const request = require("request");
 const { ipcRenderer } = window.require("electron");
@@ -36,36 +34,34 @@ class HomePage extends React.Component {
     }
     signIn() {
         GetOs()
-            //.then((data) => console.log(data))
             .then(data => this.props.saveOS(data))
-
             .then(() => this.props.getDrives(ScanDrives()))
             .then(() => ScanDriveGameLaunchers(GetUsername(), this.props.app))
             .then(() => GetFiles(this.props.app, GetUsername()))
-            // .then(() => {
-            //     const auth = ipcRenderer.sendSync("Authenticate");
-            //     console.log(auth.access_token);
-            //     request(
-            //         {
-            //             method: "get",
-            //             uri: "https://www.googleapis.com/userinfo/v2/me",
-            //             headers: {
-            //                 "Content-Type": "application/json",
-            //                 Authorization: `Bearer ${auth.access_token}`
-            //             }
-            //         },
-            //         function(err, response, body) {
-            //             if (err) {
-            //                 console.log(err);
-            //             } else {
-            //                 console.log(body);
-            //             }
-            //         }
-            //     );
-            // })
+            .then(() => {
+                const auth = ipcRenderer.sendSync("Authenticate");
+                console.log(auth.access_token);
+                request(
+                    {
+                        method: "get",
+                        uri: "https://www.googleapis.com/userinfo/v2/me",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${auth.access_token}`
+                        }
+                    },
+                    function(err, response, body) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            console.log(body);
+                        }
+                    }
+                );
+            })
             .then(() => SearchComplete())
             .then(() => this.setState({ redirect: <Redirect to={"/home"} /> }))
-            .then(() => ConfigMain(this.props.app,GetUsername()))
+            .then(() => ConfigMain(this.props.app, GetUsername()))
             .catch(err => console.log(err));
     }
     render() {
@@ -109,7 +105,7 @@ class HomePage extends React.Component {
 
 const styles = theme =>
     createStyles({
-        HomePage:{
+        HomePage: {
             backgroundColor: "white",
             minHeight: "100vh",
             display: "flex",

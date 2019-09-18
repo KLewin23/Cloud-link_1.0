@@ -1,42 +1,123 @@
 import React from "react";
 import { withStyles, createStyles } from "@material-ui/core/styles";
-import { IconButton, Modal, Tooltip } from "@material-ui/core";
-import { closeModal, setGamePaths, setPath } from "../store/actions";
+import { IconButton, Modal, TextField, Tooltip } from "@material-ui/core";
 import { connect } from "react-redux";
-import { openAddGame, closeAddGame} from "../store/actions";
+import { closeAddGame, setImage, addNewGame } from "../store/actions";
 import Backdrop from "@material-ui/core/Backdrop";
 import SetLocation from "./SetLocation";
-import { AddCircleOutline, AddPhotoAlternate } from "@material-ui/icons";
+import {AddPhotoAlternate } from "@material-ui/icons";
+import CustomButton from "./Button";
 
-function AddGameModal(props) {
-    const classes = props.classes;
-    const open = props.modal.state;
+const { ipcRenderer } = window.require("electron");
 
-    return (
-        <Modal
-            aria-labelledby="simple-modal-title"
-            aria-describedby="simple-modal-description"
-            className={classes.modal}
-            open={open}
-            onClose={props.closeAddGame}
-            closeAfterTransition
-            BackdropComponent={Backdrop}
-            BackdropProps={{
-                timeout: 500
-            }}
-        >
-            <div className={classes.paper}>
-                <div className={classes.imagePlaceholder}>
-                    <Tooltip title={"Add Image"}>
-                        <IconButton  onClick={props.openAddGame}>
-                            <AddPhotoAlternate/>
-                        </IconButton>
-                    </Tooltip>
+class AddGameModal extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            imageSelector: <div></div>,
+            name: ""
+        };
+        this.save = this.save.bind(this);
+        this.image = this.image.bind(this);
+        this.getImage = this.getImage.bind(this);
+    }
+
+    componentDidMount() {
+        this.image();
+    }
+
+    getImage() {
+        const props = this.props;
+        new Promise((resolve, reject) => {
+            ipcRenderer.send("getImage", props.app.config.imagePath);
+            ipcRenderer.on("returnImage", function(even, data) {
+                console.log(data.location)
+                props.setImage(data.location);
+                resolve(data.file);
+            });
+        }).then(data => this.image(data));
+    }
+
+    image(file) {
+        const classes = this.props.classes;
+        console.log(this.props.modal.image)
+        if (this.props.modal.image !== "" && this.props.modal.image !== undefined) {
+            this.setState({
+                imageSelector: <div id={"image_container"}></div>
+            });
+            const output = '<img style="height: 200px" src="data:image/png;base64,' + file + '" />';
+            const target = document.getElementById("image_container");
+            target.insertAdjacentHTML("beforeend", output);
+        } else {
+            this.setState({
+                imageSelector: (
+                    <div className={classes.imagePlaceholder}>
+                        <Tooltip title={"Add Image"}>
+                            <IconButton onClick={this.getImage}>
+                                <AddPhotoAlternate />
+                            </IconButton>
+                        </Tooltip>
+                    </div>
+                )
+            });
+        }
+    }
+
+    save(){
+        this.props.addNewGame({name: this.state.name, path: this.props.modal.path, image: this.props.modal.image})
+        console.log("saved")
+    }
+
+    render() {
+
+        const classes = this.props.classes;
+        const open = this.props.modal.state;
+
+        return (
+            <Modal
+                aria-labelledby="simple-modal-title"
+                aria-describedby="simple-modal-description"
+                className={classes.modal}
+                open={open}
+                onClose={this.props.closeAddGame}
+                closeAfterTransition
+                BackdropComponent={Backdrop}
+                BackdropProps={{
+                    timeout: 500
+                }}
+            >
+                <div className={classes.paper}>
+                    {this.state.imageSelector}
+                    <TextField
+                        margin={this.props.margin}
+                        id="outlined-adornment-password"
+                        variant="outlined"
+                        type={"text"}
+                        label="Name"
+                        value={this.state.name}
+                        onChange={e => this.setState({ name: e.target.value })}
+                        style={{ marginTop: "30px", width: "100%" }}
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                    />
+                    <SetLocation type={"new"} />
+                    <CustomButton
+                        click={this.save}
+                        top={"50px"}
+                        justify={"center"}
+                        margin={"special"}
+                        textColor={"white"}
+                        type={"contained"}
+                        color={"black"}
+                        text={"Save"}
+                        width={"150px"}
+                        height={"40px"}
+                    />
                 </div>
-                <SetLocation/>
-            </div>
-        </Modal>
-    );
+            </Modal>
+        );
+    }
 }
 
 const styles = createStyles(theme => ({
@@ -56,7 +137,7 @@ const styles = createStyles(theme => ({
     image: {
         height: "200px"
     },
-    imagePlaceholder:{
+    imagePlaceholder: {
         height: 230,
         width: 180,
         backgroundColor: "#f0f0f0",
@@ -70,12 +151,15 @@ const styles = createStyles(theme => ({
 
 const mapStateToProps = state => {
     return {
-        modal: state.AddGameReducer
+        modal: state.AddGameReducer,
+        app: state.appReducer
     };
 };
 
 const mapDispatchToProps = {
-    closeAddGame
+    closeAddGame,
+    setImage,
+    addNewGame
 };
 
 export default connect(

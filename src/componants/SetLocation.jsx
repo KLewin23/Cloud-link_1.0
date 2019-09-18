@@ -4,7 +4,7 @@ import { TextField, IconButton, InputAdornment } from "@material-ui/core";
 import { Folder } from "@material-ui/icons";
 import clsx from "clsx";
 import { connect } from "react-redux";
-import { setNewPath, setGamePaths } from "../store/actions";
+import { setNewPath, setGamePaths, setGamePath } from "../store/actions";
 
 const { ipcRenderer } = window.require("electron");
 
@@ -22,7 +22,11 @@ function SetLocation(props) {
     function getFolder() {
         ipcRenderer.send("getFolder");
         ipcRenderer.on("returnFolder", function(even, data) {
-            props.setNewPath(data[0]);
+            if(props.type === "modify"){
+                props.setNewPath(data[0]);
+            } else if (props.type === "new"){
+                props.setGamePath(data[0])
+            }
             setValues({ ...values, location: data[0] });
         });
     }
@@ -74,7 +78,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = {
     setNewPath,
-    setGamePaths
+    setGamePaths,
+    setGamePath
 };
 export default connect(
     mapStateToProps,

@@ -20,7 +20,8 @@ function createWindow() {
         height: 626,
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
-            nodeIntegration: true
+            nodeIntegration: true,
+            webSecurity: false
         },
         autoHideMenuBar: true,
         center: true,
@@ -143,18 +144,49 @@ ipcMain.on("getFolder", event => {
     );
 });
 
-ipcMain.on("createFile", (event , arg) => {
-    fs.appendFile(arg.name, arg.contents, function(err){
-        if (err) throw err;
-        event.returnValue = "success"
-    })
+ipcMain.on("getImage", (event, args) => {
+    dialog.showOpenDialog(
+        null,
+        {
+            filters: [{ name: "images", extensions: ["jpg", "png", "gif"] }],
+            properties: ["openFile"]
+        },
+        file => {
+            fs.copyFile(file[0],path.join(args,path.basename(file[0])), function(err) {
+                if (err) throw err
+            });
+            const image = fs.readFileSync(file[0]).toString("base64");
+            event.sender.send("returnImage", { file: image, location: path.join(args,path.basename(file[0])) });
+        }
+    );
 });
 
-ipcMain.on("overwriteFile", (event , arg) => {
-    fs.writeFile(arg.name,arg.contents, function(err){
+ipcMain.on("createFile", (event, arg) => {
+    fs.appendFile(arg.name, arg.contents, function(err) {
+        if (err) throw err;
+        event.returnValue = "success";
+    });
+});
+
+ipcMain.on("createFolder", (event, arg) => {
+    fs.mkdir(arg, function(err) {
         if (err) throw err;
         event.returnValue = "success"
-    })
+    });
+});
+
+ipcMain.on("overwriteFile", (event, arg) => {
+    fs.writeFile(arg.name, arg.contents, function(err) {
+        if (err) throw err;
+        event.returnValue = "success";
+    });
+});
+
+ipcMain.on("readFile", (event, arg) => {
+    fs.readFile(arg.path, "utf8", function(err, data) {
+        if (err) throw err;
+        event.returnValue = data;
+    });
 });
 
 function getAuthenticatedUser() {

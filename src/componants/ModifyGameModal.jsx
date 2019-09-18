@@ -1,12 +1,18 @@
 import React from "react";
-import { Modal } from "@material-ui/core";
-import { Grid, withStyles, createStyles } from "@material-ui/core";
+import CustomButton from "./Button";
 import { connect } from "react-redux";
-import { closeModal, setPath, setGamePaths } from "../store/actions";
+import SetLocation from "./SetLocation";
+import { Modal } from "@material-ui/core";
 import Backdrop from "@material-ui/core/Backdrop";
 import { useSpring, animated } from "react-spring";
-import SetLocation from "./SetLocation";
-import CustomButton from "./Button";
+import { Grid, withStyles, createStyles } from "@material-ui/core";
+import {
+    closeModal,
+    setPath,
+    setGamePaths,
+    addGameConfig,
+    changeConfigGamePath
+} from "../store/actions";
 const launcherImg = require.context("../images/Games", true);
 
 const Fade = React.forwardRef(function Fade(props, ref) {
@@ -33,19 +39,48 @@ const Fade = React.forwardRef(function Fade(props, ref) {
     );
 });
 
-
-
 function ModifyGameModal(props) {
     const classes = props.classes;
     const open = props.modal.state;
-
-    function setLocationFinish(){
-        props.setPath(props.app.gamePaths[props.modal.currentGame] = props.modal.newPath);
+    function setLocationFinish() {
+        props.setPath(
+            (props.app.gamePaths[props.modal.currentGame] = props.modal.newPath)
+        );
         const gamePaths = props.app.gamePaths;
         gamePaths[props.modal.currentGame] = props.modal.newPath;
         props.setGamePaths(gamePaths);
-        props.closeModal()
+        props.changeConfigGamePath({name: props.modal.currentGame, path: props.modal.newPath});
+        //updateFile(props.app, GetUsername());
+        props.closeModal();
     }
+
+    const verify = () => {
+        props.addGameConfig({ name: props.modal.currentGame, path: props.app.gamePaths[props.modal.currentGame]});
+    };
+
+    const verified = () => {
+        const game = props.modal.currentGame;
+        return Object.keys(props.app.gamePaths).includes(game) &&
+            !Object.keys(props.app.config.games).includes(game) ? (
+            <div>
+                Verify this is the correct save location
+                <CustomButton
+                    click={verify}
+                    top={"50px"}
+                    justify={"center"}
+                    margin={"special"}
+                    textColor={"white"}
+                    type={"contained"}
+                    color={"black"}
+                    text={"Save"}
+                    width={"150px"}
+                    height={"40px"}
+                />
+            </div>
+        ) : (
+            <div>This game is verified</div>
+        );
+    };
 
     return (
         <Modal
@@ -65,17 +100,29 @@ function ModifyGameModal(props) {
                     <Grid>
                         <Grid item>
                             <img
-                                alt={"Image Missing"}
                                 src={launcherImg("./" + "dishonoured" + ".jpg")}
                                 className={classes.image}
+                                alt={"Missing"}
                             />
                         </Grid>
                         <Grid item>
-                            <SetLocation location={props.modal.currentPath} />
+                            <SetLocation location={props.modal.currentPath} type={"modify"} />
                         </Grid>
                         <Grid item>
-                            <CustomButton click={setLocationFinish} top={"50px"} justify={"center"} margin={"special"} textColor={"white"} type={"contained"} color={"black"} text={"Save"} width={"150px"} height={"40px"}/>
+                            <CustomButton
+                                click={setLocationFinish}
+                                top={"50px"}
+                                justify={"center"}
+                                margin={"special"}
+                                textColor={"white"}
+                                type={"contained"}
+                                color={"black"}
+                                text={"Save"}
+                                width={"150px"}
+                                height={"40px"}
+                            />
                         </Grid>
+                        {verified()}
                     </Grid>
                 </div>
             </Fade>
@@ -98,8 +145,8 @@ const styles = theme =>
             justifyContent: "center",
             outline: "none"
         },
-        image:{
-            height:"200px"
+        image: {
+            height: "200px"
         }
     });
 
@@ -113,7 +160,9 @@ const mapStateToProps = state => {
 const mapDispatchToProps = {
     closeModal,
     setPath,
-    setGamePaths
+    setGamePaths,
+    addGameConfig,
+    changeConfigGamePath
 };
 export default connect(
     mapStateToProps,
