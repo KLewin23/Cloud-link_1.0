@@ -38,27 +38,27 @@ class HomePage extends React.Component {
             .then(() => this.props.getDrives(ScanDrives()))
             .then(() => ScanDriveGameLaunchers(GetUsername(), this.props.app))
             .then(() => GetFiles(this.props.app, GetUsername()))
-            .then(() => {
-                const auth = ipcRenderer.sendSync("Authenticate");
-                console.log(auth.access_token);
-                request(
-                    {
-                        method: "get",
-                        uri: "https://www.googleapis.com/userinfo/v2/me",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${auth.access_token}`
-                        }
-                    },
-                    function(err, response, body) {
-                        if (err) {
-                            console.log(err);
-                        } else {
-                            console.log(body);
-                        }
-                    }
-                );
-            })
+            // .then(() => {
+            //     const auth = ipcRenderer.sendSync("Authenticate");
+            //     console.log(auth.access_token);
+            //     request(
+            //         {
+            //             method: "get",
+            //             uri: "https://www.googleapis.com/userinfo/v2/me",
+            //             headers: {
+            //                 "Content-Type": "application/json",
+            //                 Authorization: `Bearer ${auth.access_token}`
+            //             }
+            //         },
+            //         function(err, response, body) {
+            //             if (err) {
+            //                 console.log(err);
+            //             } else {
+            //                 console.log(body);
+            //             }
+            //         }
+            //     );
+            // })
             .then(() => SearchComplete())
             .then(() => this.setState({ redirect: <Redirect to={"/home"} /> }))
             .then(() => ConfigMain(this.props.app, GetUsername()))

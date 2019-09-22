@@ -5,8 +5,9 @@ import { connect } from "react-redux";
 import { closeAddGame, setImage, addNewGame } from "../store/actions";
 import Backdrop from "@material-ui/core/Backdrop";
 import SetLocation from "./SetLocation";
-import {AddPhotoAlternate } from "@material-ui/icons";
+import { AddPhotoAlternate } from "@material-ui/icons";
 import CustomButton from "./Button";
+import CalculateAspectRation from "../scripts/functions/CalculateAspectRation";
 
 const { ipcRenderer } = window.require("electron");
 
@@ -31,21 +32,38 @@ class AddGameModal extends React.Component {
         new Promise((resolve, reject) => {
             ipcRenderer.send("getImage", props.app.config.imagePath);
             ipcRenderer.on("returnImage", function(even, data) {
-                console.log(data.location)
-                props.setImage(data.location);
-                resolve(data.file);
+                const aspectRatio = CalculateAspectRation(
+                    data.height,
+                    data.width
+                );
+                if (aspectRatio[0] !== 11 || aspectRatio[1] !== 8) {
+                    console.log(aspectRatio)
+                    reject();
+                } else {
+                    props.setImage(data.location);
+                    resolve(data.file);
+                }
             });
-        }).then(data => this.image(data));
+        })
+            .then(data => this.image(data))
+            .catch(() => {
+                alert("Image not of correct aspect ratio: 11:8");
+            });
     }
 
     image(file) {
         const classes = this.props.classes;
-        console.log(this.props.modal.image)
-        if (this.props.modal.image !== "" && this.props.modal.image !== undefined) {
+        if (
+            this.props.modal.image !== "" &&
+            this.props.modal.image !== undefined
+        ) {
             this.setState({
                 imageSelector: <div id={"image_container"}></div>
             });
-            const output = '<img style="height: 200px" src="data:image/png;base64,' + file + '" />';
+            const output =
+                '<img style="height: 200px" src="data:image/png;base64,' +
+                file +
+                '" />';
             const target = document.getElementById("image_container");
             target.insertAdjacentHTML("beforeend", output);
         } else {
@@ -63,13 +81,16 @@ class AddGameModal extends React.Component {
         }
     }
 
-    save(){
-        this.props.addNewGame({name: this.state.name, path: this.props.modal.path, image: this.props.modal.image})
-        console.log("saved")
+    save() {
+        this.props.addNewGame({
+            name: this.state.name,
+            path: this.props.modal.path,
+            image: this.props.modal.image
+        });
+        console.log("saved");
     }
 
     render() {
-
         const classes = this.props.classes;
         const open = this.props.modal.state;
 
@@ -98,7 +119,7 @@ class AddGameModal extends React.Component {
                         onChange={e => this.setState({ name: e.target.value })}
                         style={{ marginTop: "30px", width: "100%" }}
                         InputLabelProps={{
-                            shrink: true,
+                            shrink: true
                         }}
                     />
                     <SetLocation type={"new"} />

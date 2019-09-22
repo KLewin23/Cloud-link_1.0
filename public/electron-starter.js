@@ -10,6 +10,7 @@ const http = require("http");
 const destroyer = require("server-destroy");
 const fp = require("find-free-port");
 const dialog = require("electron").dialog;
+const sizeOf = require("image-size");
 
 let mainWindow;
 
@@ -152,13 +153,30 @@ ipcMain.on("getImage", (event, args) => {
             properties: ["openFile"]
         },
         file => {
-            fs.copyFile(file[0],path.join(args,path.basename(file[0])), function(err) {
-                if (err) throw err
-            });
+            fs.copyFile(
+                file[0],
+                path.join(args, path.basename(file[0])),
+                function(err) {
+                    if (err) throw err;
+                }
+            );
+
+            const dimensions = sizeOf(file[0]);
+
             const image = fs.readFileSync(file[0]).toString("base64");
-            event.sender.send("returnImage", { file: image, location: path.join(args,path.basename(file[0])) });
+            event.sender.send("returnImage", {
+                file: image,
+                location: path.join(args, path.basename(file[0])),
+                width: dimensions.width,
+                height: dimensions.height
+            });
         }
     );
+});
+
+ipcMain.on("getImageRaw", (event, args) => {
+    const image = fs.readFileSync(args).toString("base64");
+    event.returnValue = image;
 });
 
 ipcMain.on("createFile", (event, arg) => {
@@ -171,7 +189,7 @@ ipcMain.on("createFile", (event, arg) => {
 ipcMain.on("createFolder", (event, arg) => {
     fs.mkdir(arg, function(err) {
         if (err) throw err;
-        event.returnValue = "success"
+        event.returnValue = "success";
     });
 });
 

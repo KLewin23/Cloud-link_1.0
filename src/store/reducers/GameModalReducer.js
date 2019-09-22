@@ -4,14 +4,16 @@ import {
     CHANGE_TITLE,
     SET_GAME,
     SET_PATH,
-    SET_NEW_PATH
+    SET_NEW_PATH,
+    SET_MODIFY_IMAGE
 } from "../types";
 
 const initialState = {
     state: false,
     currentPath: "",
     currentGame: "",
-    newPath: ""
+    newPath: "",
+    image: ""
 };
 
 export default (state = initialState, action) => {
@@ -49,6 +51,12 @@ export default (state = initialState, action) => {
                 ...state,
                 newPath: action.payload
             };
+        case SET_MODIFY_IMAGE:
+            console.log(action.payload)
+            return {
+                ...state,
+                image: action.payload
+            }
         default:
             return state;
     }

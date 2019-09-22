@@ -25,6 +25,7 @@ export const SET_IMAGE = "SET_IMAGE";
 export const SET_IMAGE_CONFIG_PATH = "SET_IMAGE_CONFIG_PATH";
 export const ADD_NEW_GAME = "ADD_NEW_GAME";
 export const SET_NEW_GAME_PATH = "SET_NEW_GAME_PATH";
+export const SET_MODIFY_IMAGE = "SET_MODIFY_IMAGE";
 
 
 // settings
