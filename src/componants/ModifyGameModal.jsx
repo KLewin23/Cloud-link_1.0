@@ -152,6 +152,8 @@ function ModifyGameModal(props) {
                 props.modal.currentGame
             )
         ) {
+            console.log(props.app.config.images)
+            console.log(props.modal.currentGame)
             new Promise((resolve, reject) => {
                 const image = ipcRenderer.sendSync(
                     "getImageRaw",
@@ -167,6 +169,8 @@ function ModifyGameModal(props) {
                 target.insertAdjacentHTML("beforeend", data);
             });
         } else {
+            console.log(props.app.config.images)
+            console.log(props.modal.currentGame)
             setComponent(
                 <div className={classes.imagePlaceholder}>
                     <Tooltip title={"Add Image"}>
@@ -178,6 +182,7 @@ function ModifyGameModal(props) {
             );
         }
     }, []);
+
     return (
         <Modal
             aria-labelledby="simple-modal-title"

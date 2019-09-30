@@ -17,21 +17,29 @@ class Tile extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            component: <div id={this.props.title}></div>
+            component: (
+                <div
+                    id={this.props.title}
+                />
+            )
         };
         this.open = this.open.bind(this);
     }
 
     open() {
-        this.props.setGame(this.props.title);
-        if (this.props.modal.currentPath === "") {
-            this.props.setPath(this.props.app.gamePaths[this.props.title]);
-        }
-        this.props.open();
+        new Promise (resolve => {
+            this.props.setGame(this.props.title);
+            resolve()
+        }).then(()=>{
+            if (this.props.modal.currentPath === "") {
+                this.props.setPath(this.props.app.gamePaths[this.props.title]);
+            }
+            this.props.open();
+        })
     }
 
     componentDidMount() {
-        console.log(this.props.app.config)
+        console.log(this.props.app.config);
         if (
             Object.keys(this.props.app.config.images).includes(this.props.title)
         ) {
@@ -41,7 +49,7 @@ class Tile extends React.Component {
                     this.props.app.config.images[this.props.title]
                 );
                 resolve(
-                    '<img style="height: 200px" src="data:image/png;base64,' +
+                    '<img style="height: 275px; width: 200px;" src="data:image/png;base64,' +
                         image +
                         '" />'
                 );
