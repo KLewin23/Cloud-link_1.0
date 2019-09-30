@@ -19,10 +19,7 @@ class Tile extends React.Component {
         this.state = {
             component: <div id={this.props.title}></div>
         };
-
         this.open = this.open.bind(this);
-        // this.image = this.image.bind(this);
-        // this.image();
     }
 
     open() {
@@ -34,6 +31,7 @@ class Tile extends React.Component {
     }
 
     componentDidMount() {
+        console.log(this.props.app.config)
         if (
             Object.keys(this.props.app.config.images).includes(this.props.title)
         ) {
@@ -52,7 +50,6 @@ class Tile extends React.Component {
                 target.insertAdjacentHTML("beforeend", data);
             });
         } else {
-            //this.setState({component:<img style={{height: "275px", width: "200px"}} src={require("../images/Games/dishonoured.jpg")}/> })
             this.setState({
                 component: (
                     <div

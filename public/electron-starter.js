@@ -26,7 +26,8 @@ function createWindow() {
         },
         autoHideMenuBar: true,
         center: true,
-        frame: false
+        frame: false,
+        icon: path.join(__dirname,'/src/images/logoPlc.png')
     });
 
     // and load the index.html of the app.

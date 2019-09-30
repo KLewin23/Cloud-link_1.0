@@ -12,7 +12,6 @@ const initialState = {
 };
 
 export default (state = initialState, action) => {
-    console.log(action.type)
     switch (action.type) {
         case OPEN_ADD_GAME_MODEL:
             return {

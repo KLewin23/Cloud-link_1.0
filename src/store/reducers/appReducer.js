@@ -117,13 +117,6 @@ export default (state = initialState, action) => {
                     }
                 }
             };
-        case SET_CONFIG_FILE_PATH:
-            return {
-                ...state,
-                config: {
-                    filePath: action.payload
-                }
-            };
         case SET_BASE_CONFIG:
             return {
                 ...state,
@@ -135,6 +128,21 @@ export default (state = initialState, action) => {
                 config:{
                     ...state.config,
                     games: action.payload
+                }
+            };
+        case SET_CONFIG_FILE_PATH:
+            updateFile( {
+                ...state,
+                config: {
+                    ...state.config,
+                    filePath: action.payload
+                }
+            }, GetUsername());
+            return {
+                ...state,
+                config: {
+                    ...state.config,
+                    filePath: action.payload
                 }
             };
         case CHANGE_CONFIG_GAME_PATH:
@@ -171,7 +179,6 @@ export default (state = initialState, action) => {
                 config:{
                     ...state.config,
                     imagePath: action.payload,
-
                 }
             };
         case ADD_NEW_GAME:

@@ -69,7 +69,6 @@ export function GetFiles(app, username) {
         const value = ipcRenderer
             .sendSync("getFiles", path)
             .filter(i => !i.startsWith("."));
-        console.log(value);
         return {
             ...acc,
             [launcher[0]]: value
@@ -80,7 +79,6 @@ export function GetFiles(app, username) {
             (acc, installedGame) => {
                 const game = installedGame.toString().toLowerCase();
                 const GamesSys = Games[app.os][launcher];
-                console.log(game)
                 return game in GamesSys
                     ? { ...acc, [game]: GamesSys[game] }
                     : { ...acc };

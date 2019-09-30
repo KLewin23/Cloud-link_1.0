@@ -59,9 +59,10 @@ class HomePage extends React.Component {
             //         }
             //     );
             // })
+            .then(() => ConfigMain(this.props.app, GetUsername()))
+            .then(() => console.log(this.props.app))
             .then(() => SearchComplete())
             .then(() => this.setState({ redirect: <Redirect to={"/home"} /> }))
-            .then(() => ConfigMain(this.props.app, GetUsername()))
             .catch(err => console.log(err));
     }
     render() {

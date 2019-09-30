@@ -72,33 +72,36 @@ function ModifyGameModal(props) {
     };
 
     const verified = () => {
-        const game = props.modal.currentGame;
-        return Object.keys(props.app.gamePaths).includes(game) &&
-            !Object.keys(props.app.config.games).includes(game) ? (
-            <div>
-                Verify this is the correct save location
-                <CustomButton
-                    click={verify}
-                    top={"50px"}
-                    justify={"center"}
-                    margin={"special"}
-                    textColor={"white"}
-                    type={"contained"}
-                    color={"black"}
-                    text={"Save"}
-                    width={"150px"}
-                    height={"40px"}
-                />
-            </div>
-        ) : (
-            <div>This game is verified</div>
-        );
+        // console.log(props.app.gamePaths)
+        // const game = props.modal.currentGame;
+        // return Object.keys(props.app.gamePaths).includes(game) &&
+        //     !Object.keys(props.app.config.games).includes(game) ? (
+        //     <div>
+        //         Verify this is the correct save location
+        //         <CustomButton
+        //             click={verify}
+        //             top={"50px"}
+        //             justify={"center"}
+        //             margin={"special"}
+        //             textColor={"white"}
+        //             type={"contained"}
+        //             color={"black"}
+        //             text={"Save"}
+        //             width={"150px"}
+        //             height={"40px"}
+        //         />
+        //     </div>
+        // ) : (
+        //     <div>This game is verified</div>
+        // );
+        return (<div></div>)
     };
 
     const image = file => {
         const classes = props.classes;
-        console.log(props.modal.image)
+        console.log(props.modal.image);
         if (props.modal.image !== "" && props.modal.image !== undefined) {
+            console.log("xx")
             setComponent(<div id={"modify-image"}></div>);
             const output =
                 '<img style="height: 200px" src="data:image/png;base64,' +
@@ -123,7 +126,6 @@ function ModifyGameModal(props) {
         new Promise((resolve, reject) => {
             ipcRenderer.send("getImage", props.app.config.imagePath);
             ipcRenderer.on("returnImage", function(even, data) {
-                console.log(data);
                 const aspectRatio = CalculateAspectRation(
                     data.height,
                     data.width
@@ -145,7 +147,6 @@ function ModifyGameModal(props) {
     };
 
     useEffect(() => {
-        console.log(props.app.config.imagePath)
         if (
             Object.keys(props.app.config.images).includes(
                 props.modal.currentGame
@@ -177,7 +178,6 @@ function ModifyGameModal(props) {
             );
         }
     }, []);
-
     return (
         <Modal
             aria-labelledby="simple-modal-title"
