@@ -1,10 +1,9 @@
 import {
     TOGGLE_FULLSCREEN,
-    TOGGLE_USER_STATUS,
     SEND_USER_INFO,
-    SEND_LOCATION,
     SAVEOS,
     GETDRIVES,
+    SAVEAUTHKEY,
     SETLAUNCHERS,
     SET_GAME_PATHS,
     CONFIG_ADD_GAME,
@@ -14,6 +13,8 @@ import {
     CHANGE_CONFIG_GAME_PATH,
     SET_IMAGE_CONFIG_PATH,
     ADD_NEW_GAME,
+    SAVE_CONFIG,
+    CONFIG_ADD_IMAGE_PATH
 
 } from "../types";
 
@@ -22,18 +23,8 @@ export const toggleFullscreen = payload => ({
     payload
 });
 
-export const toggleUserStatus = payload => ({
-    type: TOGGLE_USER_STATUS,
-    payload
-});
-
 export const sendUserInfo = payload => ({
     type: SEND_USER_INFO,
-    payload
-});
-
-export const sendLocation = payload => ({
-    type: SEND_LOCATION,
     payload
 });
 
@@ -46,6 +37,11 @@ export const getDrives = payload => ({
     type: GETDRIVES,
     payload
 });
+
+export const saveAuthKey = payload => ({
+    type: SAVEAUTHKEY,
+    payload
+})
 
 export const setLaunchers = payload => ({
     type: SETLAUNCHERS,
@@ -90,5 +86,14 @@ export const setImageConfigPath = payload => ({
 export const addNewGame = payload => ({
     type: ADD_NEW_GAME,
     payload
+});
+
+export const addImage = payload => ({
+    type: CONFIG_ADD_IMAGE_PATH,
+    payload
+});
+
+export const saveConfig = () => ({
+    type: SAVE_CONFIG
 });
 

@@ -87,7 +87,6 @@ class AddGameModal extends React.Component {
             path: this.props.modal.path,
             image: this.props.modal.image
         });
-        console.log("saved");
     }
 
     render() {

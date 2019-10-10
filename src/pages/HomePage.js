@@ -16,12 +16,12 @@ import {
     saveOS,
     getDrives,
     setLaunchers,
-    addDriveCheckMessage
+    addDriveCheckMessage,
+    saveAuthKey
 } from "../store/actions";
 import { connect } from "react-redux";
 import { ConfigMain } from "../scripts/ConfigHandler";
-
-const request = require("request");
+import request from 'request';
 const { ipcRenderer } = window.require("electron");
 
 class HomePage extends React.Component {
@@ -40,7 +40,7 @@ class HomePage extends React.Component {
             .then(() => GetFiles(this.props.app, GetUsername()))
             // .then(() => {
             //     const auth = ipcRenderer.sendSync("Authenticate");
-            //     console.log(auth.access_token);
+            //     this.props.saveAuthKey(auth.access_token);
             //     request(
             //         {
             //             method: "get",
@@ -60,7 +60,6 @@ class HomePage extends React.Component {
             //     );
             // })
             .then(() => ConfigMain(this.props.app, GetUsername()))
-            .then(() => console.log(this.props.app))
             .then(() => SearchComplete())
             .then(() => this.setState({ redirect: <Redirect to={"/home"} /> }))
             .catch(err => console.log(err));
@@ -135,7 +134,8 @@ const mapDispatchToProps = {
     saveOS,
     getDrives,
     setLaunchers,
-    addDriveCheckMessage
+    addDriveCheckMessage,
+    saveAuthKey
 };
 export default connect(
     mapStateToProps,

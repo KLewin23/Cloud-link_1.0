@@ -11,7 +11,8 @@ const destroyer = require("server-destroy");
 const fp = require("find-free-port");
 const dialog = require("electron").dialog;
 const sizeOf = require("image-size");
-
+const archiver = require("archiver");
+const request = require("request");
 let mainWindow;
 
 function createWindow() {
@@ -27,7 +28,7 @@ function createWindow() {
         autoHideMenuBar: true,
         center: true,
         frame: false,
-        icon: path.join(__dirname,'/src/images/logoPlc.png')
+        icon: path.join(__dirname, "/src/images/logoPlc.png")
     });
 
     // and load the index.html of the app.
@@ -40,7 +41,7 @@ function createWindow() {
         });
     mainWindow.loadURL(startUrl);
     mainWindow.webContents.openDevTools();
-    mainWindow.setResizable(false);
+    //mainWindow.setResizable(false);
 
     // Emitted when the window is closed.
     mainWindow.on("closed", function() {
@@ -161,9 +162,7 @@ ipcMain.on("getImage", (event, args) => {
                     if (err) throw err;
                 }
             );
-
             const dimensions = sizeOf(file[0]);
-
             const image = fs.readFileSync(file[0]).toString("base64");
             event.sender.send("returnImage", {
                 file: image,
@@ -208,6 +207,96 @@ ipcMain.on("readFile", (event, arg) => {
     });
 });
 
+ipcMain.on("archiveGame", (event, args) => {
+    const output = fs.createWriteStream(args.write);
+    const archive = archiver("zip", {
+        zlib: { level: 1 } // Sets the compression level.
+    });
+    archive.pipe(output);
+    archive.directory(args.path, args.game);
+    archive.finalize();
+    output.on('close', function() {
+        console.log(archive.pointer() + ' total bytes');
+    });
+
+    event.returnValue = "success"
+});
+
+ipcMain.on("createFolderDrive", (event, args) => {
+    return new Promise((resolve, reject) => {
+        request.post(
+            "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable",
+            {
+                headers: {
+                    Authorization: `Bearer ${args.auth}`
+                },
+                body: {
+                    name: args.title,
+                    mimeType: "application/vnd.google-apps.folder"
+                },
+                mimeType: "application/vnd.google-apps.folder",
+                json: true
+            },
+            (err, res) => {
+                request.post(
+                    res.headers.location,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${args.auth}`
+                        },
+                        mimeType: "application/vnd.google-apps.folder"
+                    },
+                    (err, res) => {
+                        if (err) throw err;
+                        event.returnValue = res;
+                    }
+                );
+            }
+        );
+    });
+});
+
+ipcMain.on("uploadFile", (event, args) => {
+    return new Promise((resolve, reject) => {
+        request.post(
+            "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable",
+            {
+                headers: {
+                    Authorization: `Bearer ${args.auth}`
+                },
+                body: {
+                    name: args.title,
+                    parents: [args.parent]
+                },
+                json: true
+            },
+            (err, res) => {
+                request.post(
+                    res.headers.location,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${args.auth}`
+                        },
+                        body: fs.createReadStream(
+                            path.join(
+                                "/Users/UNAME/Library/Application Support/Cloud-link/files/".replace(
+                                    "UNAME",
+                                    args.username
+                                ),
+                                args.file
+                            )
+                        )
+                    },
+                    (err, res) => {
+                        if (err) throw err;
+                        event.returnValue = res;
+                    }
+                );
+            }
+        );
+    });
+});
+
 function getAuthenticatedUser() {
     return new Promise((resolve, reject) => {
         fp(4000, 60000).then(freePort => {
@@ -221,7 +310,11 @@ function getAuthenticatedUser() {
             // Generate the url that will be used for the consent dialog.
             const authorizeUrl = oAuth2Client.generateAuthUrl({
                 access_type: "offline",
-                scope: "https://www.googleapis.com/auth/userinfo.profile"
+                scope: [
+                    "https://www.googleapis.com/auth/userinfo.profile",
+                    "https://www.googleapis.com/auth/drive.readonly",
+                    "https://www.googleapis.com/auth/drive"
+                ]
             });
             const server = http
                 .createServer(async (req, res) => {

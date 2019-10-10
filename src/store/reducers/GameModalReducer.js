@@ -5,7 +5,9 @@ import {
     SET_GAME,
     SET_PATH,
     SET_NEW_PATH,
-    SET_MODIFY_IMAGE
+    SET_MODIFY_IMAGE,
+    MAKE_MODIFIED,
+    UN_MODIFIED
 } from "../types";
 
 const initialState = {
@@ -13,7 +15,8 @@ const initialState = {
     currentPath: "",
     currentGame: "",
     newPath: "",
-    image: ""
+    image: "",
+    modified: false
 };
 
 export default (state = initialState, action) => {
@@ -52,11 +55,21 @@ export default (state = initialState, action) => {
                 newPath: action.payload
             };
         case SET_MODIFY_IMAGE:
-            console.log(action.payload)
             return {
                 ...state,
                 image: action.payload
-            }
+            };
+        case MAKE_MODIFIED:
+            return {
+                ...state,
+                modified: true
+            };
+        case UN_MODIFIED:
+            return {
+                ...state,
+                modified: false
+            };
+
         default:
             return state;
     }

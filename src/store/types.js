@@ -1,10 +1,9 @@
 // permissions
 export const TOGGLE_FULLSCREEN = 'TOGGLE_FULLSCREEN';
-export const TOGGLE_USER_STATUS = "TOGGLE_USER_STATUS";
 export const SEND_USER_INFO = "SEND_USER_INFO";
-export const SEND_LOCATION = "SEND_LOCATION";
 export const SAVEOS = "SAVEOS";
 export const GETDRIVES = "GETDRIVES";
+export const SAVEAUTHKEY = "SAVEAUTHKEY";
 export const SETLAUNCHERS = "SETLAUNCHERS";
 export const SET_GAME_PATHS = "SET_GAME_PATHS";
 export const ADD_MESSAGE = "ADD_MESSAGE";
@@ -26,6 +25,10 @@ export const SET_IMAGE_CONFIG_PATH = "SET_IMAGE_CONFIG_PATH";
 export const ADD_NEW_GAME = "ADD_NEW_GAME";
 export const SET_NEW_GAME_PATH = "SET_NEW_GAME_PATH";
 export const SET_MODIFY_IMAGE = "SET_MODIFY_IMAGE";
+export const MAKE_MODIFIED = "MAKE_MODIFIED";
+export const UN_MODIFIED = "UN_MODIFIED";
+export const SAVE_CONFIG = "SAVE_CONFIG";
+export const CONFIG_ADD_IMAGE_PATH = "CONFIG_ADD_IMAGE_PATH";
 
 
 // settings

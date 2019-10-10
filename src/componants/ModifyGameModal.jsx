@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import CustomButton from "./Button";
 import { connect } from "react-redux";
 import SetLocation from "./SetLocation";
-import { IconButton, Modal, Tooltip } from "@material-ui/core";
+import { IconButton, Dialog, Tooltip, TextField } from "@material-ui/core";
 import Backdrop from "@material-ui/core/Backdrop";
-import { useSpring, animated } from "react-spring";
 import { Grid, withStyles, createStyles } from "@material-ui/core";
 import {
     closeModal,
@@ -12,117 +11,150 @@ import {
     setGamePaths,
     addGameConfig,
     changeConfigGamePath,
-    setModifiedImage
+    setModifiedImage,
+    makeModified,
+    unModified,
+    saveConfig,
+    addImage
 } from "../store/actions";
-import { AddPhotoAlternate } from "@material-ui/icons";
+import { AddPhotoAlternate, Warning, Done } from "@material-ui/icons";
 import CalculateAspectRation from "../scripts/functions/CalculateAspectRation";
+import Fade from "@material-ui/core/Fade";
+import Typography from "@material-ui/core/Typography";
 const { ipcRenderer } = window.require("electron");
-const launcherImg = require.context("../images/Games", true);
 
-const Fade = React.forwardRef(function Fade(props, ref) {
-    const { in: open, children, onEnter, onExited, ...other } = props;
-    const style = useSpring({
-        from: { opacity: 0 },
-        to: { opacity: open ? 1 : 0, outline: "none" },
-        onStart: () => {
-            if (open && onEnter) {
-                onEnter();
-            }
-        },
-        onRest: () => {
-            if (!open && onExited) {
-                onExited();
-            }
-        }
-    });
-
-    return (
-        <animated.div ref={ref} style={style} {...other}>
-            {children}
-        </animated.div>
-    );
-});
-
-function ModifyGameModal(props) {
-    const classes = props.classes;
-    const open = props.modal.state;
-
-    const [component, setComponent] = useState(<div id={"modify-image"}></div>);
-
-    function setLocationFinish() {
-        props.setPath(
-            (props.app.gamePaths[props.modal.currentGame] = props.modal.newPath)
-        );
-        const gamePaths = props.app.gamePaths;
-        gamePaths[props.modal.currentGame] = props.modal.newPath;
-        props.setGamePaths(gamePaths);
-        props.changeConfigGamePath({
-            name: props.modal.currentGame,
-            path: props.modal.newPath
-        });
-        //updateFile(props.app, GetUsername());
-        props.closeModal();
+class ModifyGameModal extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            component: (
+                <div
+                    id={"modify-image"}
+                    style={{ marginRight: "90px", float: "left" }}
+                ></div>
+            ),
+            name: ""
+        };
+        this.getImage = this.getImage.bind(this);
+        this.image = this.image.bind(this);
+        this.opened = this.opened.bind(this);
+        this.verified = this.verified.bind(this);
+        this.verify = this.verify.bind(this);
+        this.save = this.save.bind(this);
     }
 
-    const verify = () => {
-        props.addGameConfig({
-            name: props.modal.currentGame,
-            path: props.app.gamePaths[props.modal.currentGame]
+    opened() {
+        this.props.unModified()
+        this.setState({ name: this.props.modal.currentGame });
+        if (
+            Object.keys(this.props.app.config.images).includes(
+                this.props.modal.currentGame
+            )
+        ) {
+            new Promise((resolve, reject) => {
+                const image = ipcRenderer.sendSync(
+                    "getImageRaw",
+                    this.props.app.config.images[this.props.modal.currentGame]
+                );
+                resolve(
+                    '<img style="height: 200px" src="data:image/png;base64,' +
+                        image +
+                        '" />'
+                );
+            }).then(data => {
+                this.props.setModifiedImage(
+                    this.props.app.config.images[this.props.modal.currentGame]
+                );
+                const target = document.getElementById("modify-image");
+                target.insertAdjacentHTML("beforeend", data);
+            });
+        } else {
+            this.setState({
+                component: (
+                    <div
+                        className={this.props.classes.imagePlaceholder}
+                        style={{ marginRight: "90px", float: "left" }}
+                    >
+                        <Tooltip title={"Add Image"}>
+                            <IconButton onClick={this.getImage}>
+                                <AddPhotoAlternate />
+                            </IconButton>
+                        </Tooltip>
+                    </div>
+                )
+            });
+        }
+    }
+
+    save() {
+        new Promise(resolve => {
+            const gamePaths = this.props.app.gamePaths;
+            gamePaths[this.props.modal.currentGame] = this.props.modal.newPath;
+            this.props.setGamePaths(gamePaths);
+            this.props.changeConfigGamePath({
+                name: this.props.modal.currentGame,
+                path: this.props.modal.newPath
+            });
+            this.props.addImage({
+                name: this.props.modal.currentGame,
+                path: this.props.modal.image
+            });
+            resolve();
+        }).then(() => {
+            this.props.saveConfig();
+            this.props.closeModal();
+            this.props.unModified();
         });
-    };
+    }
 
-    const verified = () => {
-        // console.log(props.app.gamePaths)
-        // const game = props.modal.currentGame;
-        // return Object.keys(props.app.gamePaths).includes(game) &&
-        //     !Object.keys(props.app.config.games).includes(game) ? (
-        //     <div>
-        //         Verify this is the correct save location
-        //         <CustomButton
-        //             click={verify}
-        //             top={"50px"}
-        //             justify={"center"}
-        //             margin={"special"}
-        //             textColor={"white"}
-        //             type={"contained"}
-        //             color={"black"}
-        //             text={"Save"}
-        //             width={"150px"}
-        //             height={"40px"}
-        //         />
-        //     </div>
-        // ) : (
-        //     <div>This game is verified</div>
-        // );
-        return (<div></div>)
-    };
+    verify() {
+        this.props.addGameConfig({
+            name: this.props.modal.currentGame,
+            path: this.props.app.gamePaths[this.props.modal.currentGame]
+        });
+    }
 
-    const image = file => {
-        const classes = props.classes;
-        console.log(props.modal.image);
-        if (props.modal.image !== "" && props.modal.image !== undefined) {
-            console.log("xx")
-            setComponent(<div id={"modify-image"}></div>);
+    image(file) {
+        const classes = this.props.classes;
+        if (
+            this.props.modal.image !== "" &&
+            this.props.modal.image !== undefined
+        ) {
+            this.setState({
+                component: (
+                    <div
+                        id={"modify-image"}
+                        style={{ marginRight: "90px" }}
+                    ></div>
+                )
+            });
             const output =
                 '<img style="height: 200px" src="data:image/png;base64,' +
-                file +
+                file[0] +
                 '" />';
             const target = document.getElementById("modify-image");
             target.insertAdjacentHTML("beforeend", output);
+            this.props.makeModified();
         } else {
-            setComponent(
-                <div className={classes.imagePlaceholder}>
-                    <Tooltip title={"Add Image"}>
-                        <IconButton onClick={getImage}>
-                            <AddPhotoAlternate />
-                        </IconButton>
-                    </Tooltip>
-                </div>
-            );
+            this.setState({
+                component: (
+                    <div
+                        className={classes.imagePlaceholder}
+                        style={{ marginRight: "90px" }}
+                    >
+                        <Tooltip title={"Add Image"}>
+                            <IconButton onClick={this.getImage}>
+                                <AddPhotoAlternate />
+                            </IconButton>
+                        </Tooltip>
+                    </div>
+                )
+            });
         }
-    };
+    }
 
-    const getImage = () => {
+    getImage() {
+        const props = this.props;
         new Promise((resolve, reject) => {
             ipcRenderer.send("getImage", props.app.config.imagePath);
             ipcRenderer.on("returnImage", function(even, data) {
@@ -139,93 +171,157 @@ function ModifyGameModal(props) {
             });
         }).then(data => {
             if (data[1] === true) {
-                image(data);
+                this.image(data);
             } else if (data[1] === false) {
                 alert("Image not of correct aspect ratio: 11:8");
             }
         });
-    };
+    }
 
-    useEffect(() => {
-        if (
-            Object.keys(props.app.config.images).includes(
-                props.modal.currentGame
-            )
-        ) {
-            console.log(props.app.config.images)
-            console.log(props.modal.currentGame)
-            new Promise((resolve, reject) => {
-                const image = ipcRenderer.sendSync(
-                    "getImageRaw",
-                    props.app.config.images[props.modal.currentGame]
-                );
-                resolve(
-                    '<img style="height: 200px" src="data:image/png;base64,' +
-                        image +
-                        '" />'
-                );
-            }).then(data => {
-                const target = document.getElementById("modify-image");
-                target.insertAdjacentHTML("beforeend", data);
-            });
-        } else {
-            console.log(props.app.config.images)
-            console.log(props.modal.currentGame)
-            setComponent(
-                <div className={classes.imagePlaceholder}>
-                    <Tooltip title={"Add Image"}>
-                        <IconButton onClick={getImage}>
-                            <AddPhotoAlternate />
-                        </IconButton>
-                    </Tooltip>
-                </div>
+    verified() {
+        const game = this.props.modal.currentGame;
+        return Object.keys(this.props.app.gamePaths).includes(game) &&
+            !Object.keys(this.props.app.config.games).includes(game) ? (
+            <div>
+                <Typography variant={"caption"}>
+                    Verify this is the correct save location
+                </Typography>
+                <CustomButton
+                    click={this.verify}
+                    top={"50px"}
+                    justify={"center"}
+                    margin={"special"}
+                    textColor={"white"}
+                    type={"contained"}
+                    color={"black"}
+                    text={"Save"}
+                    width={"150px"}
+                    height={"40px"}
+                />
+            </div>
+        ) : (
+            <Typography variant={"caption"}> game is verified</Typography>
+        );
+    }
+
+    render() {
+        const classes = this.props.classes;
+        const open = this.props.modal.state;
+        const modified =
+            this.props.modal.modified === true ? (
+                <Typography
+                    style={{ verticalAlign: "middle" }}
+                    variant={"caption"}
+                >
+                    Changes need saving!
+                </Typography>
+            ) : (
+                <Typography
+                    variant={"caption"}
+                    style={{ verticalAlign: "middle" }}
+                >
+                    All Changes Saved.
+                </Typography>
             );
-        }
-    }, []);
+        const icon =
+            this.props.modal.modified === true ? (
+                <Warning
+                    style={{
+                        color: "red",
+                        verticalAlign: "middle",
+                        marginLeft: "10px"
+                    }}
+                />
+            ) : (
+                <Done
+                    style={{
+                        color: "green",
+                        verticalAlign: "middle",
+                        marginLeft: "10px"
+                    }}
+                />
+            );
 
-    return (
-        <Modal
-            aria-labelledby="simple-modal-title"
-            aria-describedby="simple-modal-description"
-            className={classes.modal}
-            open={open}
-            onClose={props.closeModal}
-            closeAfterTransition
-            BackdropComponent={Backdrop}
-            BackdropProps={{
-                timeout: 500
-            }}
-        >
-            <Fade in={open}>
-                <div className={classes.paper}>
-                    <Grid>
-                        <Grid item>{component}</Grid>
-                        <Grid item>
-                            <SetLocation
-                                location={props.modal.currentPath}
-                                type={"modify"}
-                            />
+        return (
+            <Dialog
+                aria-labelledby="simple-modal-title"
+                aria-describedby="simple-modal-description"
+                className={classes.modal}
+                open={open}
+                onClose={this.props.closeModal}
+                closeAfterTransition
+                BackdropComponent={Backdrop}
+                BackdropProps={{
+                    timeout: 500
+                }}
+                onEnter={this.opened}
+            >
+                <Fade in={open}>
+                    <div className={classes.paper}>
+                        <Grid>
+                            <Grid item>
+                                {this.state.component}
+                                <Typography
+                                    style={{ textTransform: "capitalize" }}
+                                >
+                                    {this.props.modal.currentGame}
+                                </Typography>
+                            </Grid>
+                            <Grid item>
+                                <TextField
+                                    margin={this.props.margin}
+                                    id="outlined-adornment-password"
+                                    variant="outlined"
+                                    type={"text"}
+                                    label="Name"
+                                    value={this.state.name}
+                                    onChange={e => {
+                                        this.setState({ name: e.target.value });
+                                        if (e.target.value !== this.props.modal.currentGame){
+                                            this.props.makeModified();
+                                        } else {
+                                            this.props.unModified();
+                                        }
+
+                                    }}
+                                    style={{ marginTop: "30px", width: "100%" }}
+                                    InputLabelProps={{
+                                        shrink: true
+                                    }}
+                                />
+                            </Grid>
+                            <Grid item>
+                                <SetLocation
+                                    location={this.props.modal.currentPath}
+                                    type={"modify"}
+                                />
+                            </Grid>
+                            <Grid item>
+                                <CustomButton
+                                    click={this.save}
+                                    top={"50px"}
+                                    justify={"center"}
+                                    margin={"special"}
+                                    textColor={"white"}
+                                    type={"contained"}
+                                    color={"black"}
+                                    text={"Save"}
+                                    width={"150px"}
+                                    height={"40px"}
+                                />
+                            </Grid>
+                            <Grid item>
+                                {modified}
+                                {icon}
+                            </Grid>
+
+                            {this.verified()}
                         </Grid>
-                        <Grid item>
-                            <CustomButton
-                                click={setLocationFinish}
-                                top={"50px"}
-                                justify={"center"}
-                                margin={"special"}
-                                textColor={"white"}
-                                type={"contained"}
-                                color={"black"}
-                                text={"Save"}
-                                width={"150px"}
-                                height={"40px"}
-                            />
-                        </Grid>
-                        {verified()}
-                    </Grid>
-                </div>
-            </Fade>
-        </Modal>
-    );
+                    </div>
+                </Fade>
+            </Dialog>
+        );
+    }
 }
 
 const styles = theme =>
@@ -271,7 +367,11 @@ const mapDispatchToProps = {
     setGamePaths,
     addGameConfig,
     changeConfigGamePath,
-    setModifiedImage
+    setModifiedImage,
+    makeModified,
+    unModified,
+    saveConfig,
+    addImage
 };
 export default connect(
     mapStateToProps,

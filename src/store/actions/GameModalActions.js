@@ -1,4 +1,4 @@
-import { OPEN_GAME_MODEL, CLOSE_GAME_MODEL, CHANGE_TITLE, SET_PATH, SET_GAME, SET_NEW_PATH, SET_MODIFY_IMAGE } from "../types";
+import { OPEN_GAME_MODEL, CLOSE_GAME_MODEL, CHANGE_TITLE, SET_PATH, SET_GAME, SET_NEW_PATH, SET_MODIFY_IMAGE, MAKE_MODIFIED , UN_MODIFIED } from "../types";
 
 export const openModal = () => ({
     type: OPEN_GAME_MODEL
@@ -31,6 +31,14 @@ export const setNewPath = payload => ({
 export const setModifiedImage = payload => ({
     type: SET_MODIFY_IMAGE,
     payload
+});
+
+export const makeModified = () => ({
+    type: MAKE_MODIFIED
+});
+
+export const unModified = () => ({
+    type: UN_MODIFIED
 });
 
 

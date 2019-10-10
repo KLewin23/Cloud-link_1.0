@@ -6,10 +6,24 @@ import HomeTab from "./SubPages/Home";
 import CloudTab from "./SubPages/Cloud";
 import MachineTab from "./SubPages/MachineGames";
 import { connect } from "react-redux";
-import { SettingsApplicationsSharp, AddCircleOutline } from "@material-ui/icons"
-import { IconButton, Typography, Tab, Tabs, AppBar, Tooltip } from "@material-ui/core";
+import {
+    SettingsApplicationsSharp,
+    AddCircleOutline
+} from "@material-ui/icons";
+import {
+    IconButton,
+    Typography,
+    Tab,
+    Tabs,
+    AppBar,
+    Tooltip
+} from "@material-ui/core";
 import { openAddGame } from "../store/actions";
-import Modal from '../componants/AddGameModal'
+import Modal from "../componants/AddGameModal";
+import CloudUploadIcon from "@material-ui/icons/CloudUpload";
+import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
+import uploadSaves from "../scripts/functions/uploadSaves";
+import { GetUsername } from "../scripts";
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -48,6 +62,35 @@ function SimpleTabs(props) {
     function handleChange(event, newValue) {
         setValue(newValue);
     }
+    console.log(value);
+
+    const icon = () => {
+        switch (value) {
+            case 0:
+                return "";
+            case 1:
+                return (
+                    <Tooltip title={"Upload changes"}>
+                        <IconButton
+                            style={{ marginLeft: "20px" }}
+                            onClick={() =>
+                                uploadSaves(props.app, GetUsername())
+                            }
+                        >
+                            <CloudUploadIcon className={classes.settings} />
+                        </IconButton>
+                    </Tooltip>
+                );
+            case 2:
+                return (
+                    <Tooltip title={"Download changes"}>
+                        <IconButton style={{ marginLeft: "20px" }}>
+                            <CloudDownloadIcon className={classes.settings} />
+                        </IconButton>
+                    </Tooltip>
+                );
+        }
+    };
 
     return (
         <div className={classes.root}>
@@ -57,22 +100,27 @@ function SimpleTabs(props) {
                     value={value}
                     onChange={handleChange}
                     aria-label="simple tabs example"
-                    style={{height: "100%"}}
+                    style={{ height: "100%" }}
                 >
                     <StyledTab label="Home" {...a11yProps(0)} />
                     <StyledTab label="Your Machine" {...a11yProps(1)} />
                     <StyledTab label="Cloud" {...a11yProps(2)} />
-
                 </StyledTabs>
                 <div className={classes.controls}>
+                    {icon()}
                     <Tooltip title={"Add Game"}>
-                        <IconButton  onClick={props.openAddGame}>
-                            <AddCircleOutline className={classes.settings}/>
+                        <IconButton
+                            style={{ marginLeft: "20px" }}
+                            onClick={props.openAddGame}
+                        >
+                            <AddCircleOutline className={classes.settings} />
                         </IconButton>
                     </Tooltip>
                     <Tooltip title={"Settings"}>
-                        <IconButton style={{marginLeft: "20px"}}>
-                            <SettingsApplicationsSharp className={classes.settings}/>
+                        <IconButton style={{ marginLeft: "20px" }}>
+                            <SettingsApplicationsSharp
+                                className={classes.settings}
+                            />
                         </IconButton>
                     </Tooltip>
                 </div>
@@ -86,7 +134,7 @@ function SimpleTabs(props) {
                 }}
                 index={0}
             >
-                <HomeTab/>
+                <HomeTab />
             </TabPanel>
             <TabPanel
                 value={value}
@@ -136,13 +184,22 @@ const styles = createStyles(theme => ({
         flexGrow: 1,
         backgroundColor: theme.palette.background.paper
     },
+    "@global": {
+        html: {
+            height: "100%"
+        },
+        body: {
+            height: "100%",
+            backgroundColor: "#171717"
+        }
+    },
     appBar: {
         backgroundColor: "#202020"
     },
     settings: {
         color: "white"
     },
-    controls:{
+    controls: {
         position: "absolute",
         display: "inline-block",
         right: "100px"

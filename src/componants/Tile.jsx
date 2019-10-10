@@ -9,7 +9,6 @@ import {
 import InfoIcon from "@material-ui/icons/Info";
 import { connect } from "react-redux";
 import { setPath, setGame } from "../store/actions";
-import { string } from "prop-types";
 
 const { ipcRenderer } = window.require("electron");
 
@@ -39,7 +38,6 @@ class Tile extends React.Component {
     }
 
     componentDidMount() {
-        console.log(this.props.app.config);
         if (
             Object.keys(this.props.app.config.images).includes(this.props.title)
         ) {
