@@ -3,127 +3,102 @@ import {
     setConfigPath,
     setBaseConfig,
     setGamePaths,
-    setImageConfigPath
+    setImageConfigPath,
+    setClGamesFolder,
+    setClMainFolder,
+    setClConfigId,
+    setClConfig
 } from "../store/actions";
 import CheckFileExistance from "./functions/CheckFileExistance";
 import request from "request";
 import DriveConfig from "../Config/DefaultDriveConfig";
+import { GetUsername } from "../scripts/Scanner";
+import getGoogleFileContents from "./functions/getGoogleFileContents";
+import getGoogleFolderChildren from "./functions/getGoogleFolderChildren";
 const { ipcRenderer } = window.require("electron");
 
 export function ConfigMain(app, username) {
-    if (app.os === "WIN") {
-        const filesPath = "C:\\Users\\UNAME\\AppData\\Roaming\\Cloud-link\\files".replace(
-            "UNAME",
-            username
-        );
-        if (CheckFileExistance(filesPath) !== "exists") {
-            if (ipcRenderer.sendSync("createFolder", filesPath) !== "success") {
-                alert(
-                    `Error: ${filesPath} not created... this will cause issues`
-                );
-            }
+    const paths = {
+        WIN: {
+            files: "C:\\Users\\UNAME\\AppData\\Roaming\\Cloud-link\\files".replace(
+                "UNAME",
+                username
+            ),
+            driveConfig: "C:\\Users\\UNAME\\AppData\\Roaming\\Cloud-link\\files\\DefaultDriveConfig.json".replace(
+                "UNAME",
+                username
+            ),
+            gameDir: "C:\\Users\\UNAME\\AppData\\Roaming\\Cloud-link\\files\\GAMENAME".replace(
+                "UNAME",
+                username
+            ),
+            configPath: "C:\\Users\\UNAME\\AppData\\Roaming\\Cloud-link\\config.json".replace(
+                "UNAME",
+                username
+            )
+        },
+        MAC: {
+            files: "/Users/UNAME/Library/Application Support/Cloud-link/files/".replace(
+                "UNAME",
+                username
+            ),
+            driveConfig: "/Users/UNAME/Library/Application Support/Cloud-link/files/DefaultDriveConfig.json".replace(
+                "UNAME",
+                username
+            ),
+            gameDir: `/Users/UNAME/Library/Application Support/Cloud-link/files/GAMENAME`.replace(
+                "UNAME",
+                username
+            ),
+            configPath: "/Users/UNAME/Library/Application Support/Cloud-link/config.json".replace(
+                "UNAME",
+                username
+            )
         }
-        const driveConfigPath = "C:\\Users\\UNAME\\AppData\\Roaming\\Cloud-link\\files\\DefaultDriveConfig.json".replace(
-            "UNAME",
-            username
-        );
-        if (CheckFileExistance(driveConfigPath) !== "exists") {
-            if (
-                ipcRenderer.sendSync("createFile", {
-                    name: driveConfigPath,
-                    contents: JSON.stringify(DriveConfig)
-                }) !== "success"
-            ) {
-                alert(
-                    `Error: ${driveConfigPath} not created this will cause issues`
-                );
-            }
+    };
+    const osPaths = paths[app.os];
+    if (CheckFileExistance(osPaths.files) !== "exists") {
+        if (ipcRenderer.sendSync("createFolder", osPaths.files) !== "success") {
+            alert(
+                `Error: ${osPaths.files} not created... this will cause issues`
+            );
         }
-        const configPath = "C:\\Users\\UNAME\\AppData\\Roaming\\Cloud-link\\config.json".replace(
-            "UNAME",
-            username
-        );
-        if (CheckFileExistance(configPath) !== "exists") {
-            ipcRenderer.sendSync("createFile", {
-                name: configPath,
-                contents: JSON.stringify(app.config)
-            });
-            store.dispatch(setConfigPath(configPath));
-        } else {
-            const config = ipcRenderer.sendSync("readFile", {
-                path: configPath
-            });
-            store.dispatch(setBaseConfig(config));
-            reduxComparison(app, config);
-        }
-        imageConfigMain(app, username);
-    } else if (app.os === "MAC") {
-        ///////
-        //MAC//
-        ///////
-        const filesPath = "/Users/UNAME/Library/Application Support/Cloud-link/files/".replace(
-            "UNAME",
-            username
-        );
-        if (CheckFileExistance(filesPath) !== "exists") {
-            if (ipcRenderer.sendSync("createFolder", filesPath) !== "success") {
-                alert(
-                    `Error: ${filesPath} not created... this will cause issues`
-                );
-            }
-        }
-        ["localArchives","driveArchives"].forEach(name=>{
-            const dirPath = `/Users/UNAME/Library/Application Support/Cloud-link/files/${name}`.replace("UNAME",username)
-            if (CheckFileExistance(dirPath) !== "exists"){
-                if(ipcRenderer.sendSync("createFolder", dirPath) !== "success"){
-                    alert(`Error: ${dirPath} not created this will cause issues`)
-                }
-            }
-        });
-        const driveConfigPath = "/Users/UNAME/Library/Application Support/Cloud-link/files/DefaultDriveConfig.json".replace(
-            "UNAME",
-            username
-        );
-        if (CheckFileExistance(driveConfigPath) !== "exists") {
-            if (
-                ipcRenderer.sendSync("createFile", {
-                    name: driveConfigPath,
-                    contents: JSON.stringify(DriveConfig)
-                }) !== "success"
-            ) {
-                alert(
-                    `Error: ${driveConfigPath} not created this will cause issues`
-                );
-            }
-        }
-        const configPath = "/Users/UNAME/Library/Application Support/Cloud-link/config.json".replace(
-            "UNAME",
-            username
-        );
-        if (CheckFileExistance(configPath) !== "exists") {
-            ipcRenderer.sendSync("createFile", {
-                name: configPath,
-                contents: JSON.stringify(app.config)
-            });
-            store.dispatch(setConfigPath(configPath));
-        } else {
-            const config = ipcRenderer.sendSync("readFile", {
-                path: configPath
-            });
-            store.dispatch(setBaseConfig(config));
-            reduxComparison(app, config);
-        }
-        imageConfigMain(app, username);
-
-
-    } else if (app.os === "LIN") {
-        // const saveLocation = CheckFileExistance(
-        //     "~/.config/CloudGameSaveManager/config.json"
-        // );
-    } else {
-        alert("Error: OS does not conform to requirements");
     }
-    //getCloudConfig(app, username);
+    ["localArchives", "driveArchives"].forEach(name => {
+        const dirPath = osPaths.gameDir.replace("GAMENAME", name);
+        if (CheckFileExistance(dirPath) !== "exists") {
+            if (ipcRenderer.sendSync("createFolder", dirPath) !== "success") {
+                alert(`Error: ${dirPath} not created this will cause issues`);
+            }
+        }
+    });
+    if (CheckFileExistance(osPaths.driveConfig) !== "exists") {
+        if (
+            ipcRenderer.sendSync("createFile", {
+                name: osPaths.driveConfig,
+                contents: JSON.stringify(DriveConfig)
+            }) !== "success"
+        ) {
+            alert(
+                `Error: ${osPaths.driveConfig} not created this will cause issues`
+            );
+        }
+    }
+    if (CheckFileExistance(osPaths.configPath) !== "exists") {
+        ipcRenderer.sendSync("createFile", {
+            name: osPaths.configPath,
+            contents: JSON.stringify(app.config)
+        });
+        store.dispatch(setConfigPath(osPaths.configPath));
+    } else {
+        const config = ipcRenderer.sendSync("readFile", {
+            path: osPaths.configPath
+        });
+        store.dispatch(setBaseConfig(config));
+        reduxComparison(app, config);
+    }
+    imageConfigMain(app, username);
+    getCloudConfig(app, username);
 }
 
 export function updateFile(app, username) {
@@ -148,103 +123,189 @@ function reduxComparison(app, config) {
 }
 
 function imageConfigMain(app, username) {
-    if (app.os === "WIN") {
-        const imageFolder = "C:\\Users\\UNAME\\AppData\\Roaming\\Cloud-link\\Images".replace(
-            "UNAME",
-            username
-        );
-        const imageFolderExists = CheckFileExistance(imageFolder);
-        if (imageFolderExists !== "exists") {
-            if (
-                ipcRenderer.sendSync("createFolder", imageFolder) === "success"
-            ) {
-                store.dispatch(setImageConfigPath(imageFolder));
-            } else {
-                alert("Error when creating image folder");
-            }
-        } else if (
-            imageFolderExists === "exists" &&
-            app.config.imagePath === ""
-        ) {
+    const pathList = {
+        WIN: {
+            image: "C:\\Users\\UNAME\\AppData\\Roaming\\Cloud-link\\Images".replace(
+                "UNAME",
+                username
+            )
+        },
+        MAC: {
+            image: "/Users/UNAME/Library/Application Support/Cloud-link/Images".replace(
+                "UNAME",
+                username
+            )
+        }
+    };
+    if (!Object.keys(pathList).includes(app.os)) {
+        console.log("Error: your os is not listed");
+        throw '';
+    }
+    const imageFolder = pathList[app.os].image;
+    const imageFolderExists = CheckFileExistance(imageFolder);
+    if (imageFolderExists !== "exists") {
+        console.log(imageFolderExists);
+        if (ipcRenderer.sendSync("createFolder", imageFolder) === "success") {
             store.dispatch(setImageConfigPath(imageFolder));
+        } else {
+            alert("Error when creating image folder");
         }
-    } else if (app.os === "MAC") {
-        const imageFolder = "/Users/UNAME/Library/Application Support/Cloud-link/Images".replace(
-            "UNAME",
-            username
-        );
-        if (CheckFileExistance(imageFolder) !== "exists") {
-            if (
-                ipcRenderer.sendSync("createFolder", imageFolder) === "success"
-            ) {
-                store.dispatch(setImageConfigPath(imageFolder));
-            } else {
-                alert("Error when creating image folder");
-            }
-        }
-    } else if (app.os === "LIN") {
-    } else {
-        alert("Error: OS does not conform to requirements");
+    } else if (imageFolderExists === "exists" && app.config.imagePath === "") {
+        store.dispatch(setImageConfigPath(imageFolder));
     }
 }
 
 export function getCloudConfig(app, username) {
-    new Promise(resolve => {
-        request(
-            {
-                method: "get",
-                uri: "https://www.googleapis.com/drive/v2/files?trashed=false",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${app.authKey}`
-                }
+    hasGoogleObject(
+        "",
+        app,
+        "Cloud-link",
+        resultHandler,
+        "application/vnd.google-apps.folder"
+    );
+}
+
+function verifyData(files, filename, type, parent) {
+    const objects = files.files.filter(file => file.mimeType === type);
+    const parents =
+        parent !== undefined
+            ? files.files.filter(file => file.parents[0] === parent)
+            : objects;
+    const cloudLink = parents.filter(
+        file =>
+            file.name.toUpperCase() === filename.toUpperCase() &&
+            file.trashed === false &&
+            file.explicitlyTrashed === false
+    );
+    return [cloudLink.length === 1 ? cloudLink[0].id : false, objects];
+}
+
+export function hasGoogleObject(token, app, filename, callback, type, parent) {
+    const name = `name%3D%27${filename}%27`;
+    request.get(
+        `https://www.googleapis.com/drive/v3/files?q=${name}&fields=nextPageToken,files(parents,mimeType,name,id,trashed,explicitlyTrashed)&pageToken=${token}`,
+        {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${app.authKey}`
             },
-            function(err, response, body) {
-                if (err) {
-                    console.log(err);
+            json: true
+        },
+        (err, response) => {
+            if (err) {
+                throw err;
+            } else {
+                const folderCheck = verifyData(
+                    response.body,
+                    filename,
+                    type,
+                    parent
+                );
+                // prettier-ignore
+                if (folderCheck[0] !== false) {
+                    callback(folderCheck,app);
+                } else if (folderCheck[0] === false && !Object.keys(response.body).includes('nextPageToken')) {
+                    callback(folderCheck,app)
                 } else {
-                    resolve(JSON.parse(response.body));
+                    hasGoogleObject(response.body.nextPageToken, app);
                 }
             }
-        );
-    })
-        .then(files => {
-            const folders = files.items.filter(
-                file => file.mimeType === "application/vnd.google-apps.folder"
-            );
-            const cloudr = folders.filter(
-                file => file.title.toUpperCase() === "CLOUDR"
-            );
-            const hasCloudr =
-                cloudr.length === 1 && cloudr[0].explicitlyTrashed === false;
-            return hasCloudr ? cloudr[0].id : false;
-        })
-        .then(result => {
-            if (result !== false) {
-                console.log("has file");
-            } else {
-                const createFolder = ipcRenderer.sendSync("createFolderDrive", {
-                    title: "Cloud-link",
-                    auth: app.authKey
-                });
-                if (createFolder.statusCode === 200) {
+        }
+    );
+}
 
-                    const result = ipcRenderer.sendSync("uploadFile", {
-                        title: "config.json",
-                        file: "DefaultDriveConfig.json",
-                        type: "application/vnd.google-apps.document",
-                        parent: JSON.parse(createFolder.body).id,
-                        auth: app.authKey,
-                        username: username
-                    });
-                    if (result.statusCode !== 200) {
-                        alert("Error: uploading the config to google drive");
-                    }
-                } else {
-                    alert(
-                        "Error: cloud-link folder not created in google drive"
-                    );
-                }
+function resultHandler(result, app) {
+    if (result[0] !== false) {
+        hasGoogleObject(
+            "",
+            app,
+            "Cloud-link-games",
+            gamesFolderHandler,
+            "application/vnd.google-apps.folder"
+        );
+        store.dispatch(setClMainFolder(result[0]));
+    } else {
+        const createFolder = ipcRenderer.sendSync("createFolderDrive", {
+            title: "Cloud-link",
+            auth: app.authKey,
+            parent: ""
+        });
+        if (createFolder.statusCode === 200) {
+            store.dispatch(setClMainFolder(JSON.parse(createFolder.body).id));
+            const uploadResult = ipcRenderer.sendSync("uploadFile", {
+                title: "config.json",
+                file: "DefaultDriveConfig.json",
+                type: "application/vnd.google-apps.document",
+                parent: JSON.parse(createFolder.body).id,
+                auth: app.authKey,
+                username: GetUsername()
+            });
+            if (uploadResult.statusCode !== 200) {
+                alert("Error: uploading the config to google drive");
+            }
+            const gamesFolder = ipcRenderer.sendSync("createFolderDrive", {
+                title: "Cloud-link-games",
+                auth: app.authKey,
+                parent: result[0]
+            });
+            if (gamesFolder.statusCode !== 200) {
+                alert("Error: creating games folder");
+            } else {
+                store.dispatch(setClGamesFolder(gamesFolder.id));
+            }
+        } else {
+            alert("Error: cloud-link folder not created in google drive");
+        }
+    }
+}
+
+function gamesFolderHandler(result, app) {
+    if (result[0] === false) {
+        const gamesFolder = ipcRenderer.sendSync("createFolderDrive", {
+            title: "Cloud-link-games",
+            auth: app.authKey,
+            parent: result[0]
+        });
+        if (gamesFolder.statusCode !== 200) {
+            alert("Error: creating games folder");
+        } else {
+            store.dispatch(setClGamesFolder(JSON.parse(gamesFolder.body).id));
+        }
+    } else {
+        store.dispatch(setClGamesFolder(result[0]));
+        getGoogleFolderChildren('',app.authKey,result[0]);
+        hasGoogleObject(
+            "",
+            app,
+            "config.json",
+            handleGoogleConfig,
+            "application/vnd.google-apps.document",
+            store.getState().GoogleReducer.clMainFolder
+        );
+    }
+}
+
+function handleGoogleConfig(result, app) {
+    if (result[0] !== false) {
+        store.dispatch(setClConfigId(result[0]));
+        getGoogleFileContents(result[0], app.authKey, result => {
+            if (result === null) {
+                alert("Error: attempt to download config has gone wrong");
+            } else {
+                store.dispatch(setClConfig(JSON.parse(result)));
             }
         });
+    } else {
+        const uploadResult = ipcRenderer.sendSync("uploadFile", {
+            title: "config.json",
+            file: "DefaultDriveConfig.json",
+            type: "application/vnd.google-apps.document",
+            parent: store.getState().GoogleReducer.clMainFolder,
+            auth: app.authKey,
+            username: GetUsername()
+        });
+        if (uploadResult.statusCode !== 200) {
+            alert("Error: uploading the config to google drive");
+        }
+    }
 }

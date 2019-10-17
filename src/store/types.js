@@ -29,7 +29,13 @@ export const MAKE_MODIFIED = "MAKE_MODIFIED";
 export const UN_MODIFIED = "UN_MODIFIED";
 export const SAVE_CONFIG = "SAVE_CONFIG";
 export const CONFIG_ADD_IMAGE_PATH = "CONFIG_ADD_IMAGE_PATH";
-
+export const SET_CL_MAIN_FOLDER = "SET_CL_MAIN_FOLDER";
+export const SET_CL_GAMES_FOLDER = "SET_CL_GAMES_FOLDER";
+export const UPLOAD_FINISHED = "UPLOAD_FINISHED";
+export const UPLOADING_GAMES = "UPLOADING_GAMES";
+export const SET_CL_CONFIG_ID = "SET_CL_CONFIG_ID";
+export const SET_CL_CONFIG = "SET_CL_CONFIG";
+export const ADD_CL_GAMES = "ADD_CL_GAMES";
 
 // settings
 export const CHANGE_RATE = 'CHANGE_RATE';

@@ -18,12 +18,14 @@ import {
     AppBar,
     Tooltip
 } from "@material-ui/core";
-import { openAddGame } from "../store/actions";
+import { openAddGame, uploading } from "../store/actions";
 import Modal from "../componants/AddGameModal";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 import uploadSaves from "../scripts/functions/uploadSaves";
 import { GetUsername } from "../scripts";
+import Snackbar from "../componants/Snackbar";
+import store from "../store";
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -62,7 +64,6 @@ function SimpleTabs(props) {
     function handleChange(event, newValue) {
         setValue(newValue);
     }
-    console.log(value);
 
     const icon = () => {
         switch (value) {
@@ -73,9 +74,13 @@ function SimpleTabs(props) {
                     <Tooltip title={"Upload changes"}>
                         <IconButton
                             style={{ marginLeft: "20px" }}
-                            onClick={() =>
-                                uploadSaves(props.app, GetUsername())
-                            }
+                            onClick={() => {
+                                uploadSaves(
+                                    props.app,
+                                    props.google,
+                                    GetUsername()
+                                );
+                            }}
                         >
                             <CloudUploadIcon className={classes.settings} />
                         </IconButton>
@@ -95,6 +100,7 @@ function SimpleTabs(props) {
     return (
         <div className={classes.root}>
             <Modal />
+            <Snackbar open={props.google.clUploading} />
             <AppBar position="static" className={classes.appBar}>
                 <StyledTabs
                     value={value}
@@ -209,7 +215,8 @@ const styles = createStyles(theme => ({
 const mapStateToProps = state => {
     return {
         app: state.appReducer,
-        scanner: state.scannerReducer
+        scanner: state.scannerReducer,
+        google: state.GoogleReducer
     };
 };
 

@@ -5,6 +5,7 @@ import Tile from "../../componants/Tile";
 import Modal from "../../componants/ModifyGameModal";
 import { connect } from "react-redux";
 import { openModal } from "../../store/actions";
+import Typography from "@material-ui/core/Typography";
 
 function MachineTab(props) {
     const classes = props.classes;
@@ -15,12 +16,13 @@ function MachineTab(props) {
             ? Object.keys(props.games).map(game => (
                   <Tile
                       key={game}
+                      id={game}
                       title={game}
                       open={props.openModal}
                       location={props.games[game]}
                   />
               ))
-            : "";
+            : (<Typography variant={"h2"} style={{color: "white"}}>No Games Found.</Typography>);
 
     return (
         <div style={{ margin: "auto" }}>

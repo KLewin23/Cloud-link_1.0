@@ -16,6 +16,7 @@
     "drivelist": "^8.0.6",
     "find-free-port": "^2.0.0",
     "google-auth-library": "^5.2.0",
+    "googleapis": "^39.2.0",
     "image-size": "^0.8.1",
     "open": "^6.4.0",
     "os-name": "^3.1.0",

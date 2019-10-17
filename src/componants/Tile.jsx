@@ -18,7 +18,7 @@ class Tile extends React.Component {
         this.state = {
             component: (
                 <div
-                    id={this.props.title}
+                    id={this.props.id}
                 />
             )
         };
@@ -52,7 +52,7 @@ class Tile extends React.Component {
                         '" />'
                 );
             }).then(data => {
-                const target = document.getElementById(this.props.title);
+                const target = document.getElementById(this.props.id);
                 target.insertAdjacentHTML("beforeend", data);
             });
         } else {
