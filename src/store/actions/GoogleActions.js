@@ -5,7 +5,8 @@ import {
     UPLOAD_FINISHED,
     SET_CL_CONFIG_ID,
     SET_CL_CONFIG,
-    ADD_CL_GAMES
+    ADD_CL_GAMES,
+    GAME_CHECK_COMPLETE,
 } from "../types";
 
 export const setClMainFolder = payload => ({
@@ -41,4 +42,8 @@ export const uploadComplete = payload => ({
 export const addGames = payload => ({
     type: ADD_CL_GAMES,
     payload
+});
+
+export const clGameCheckComplete = payload => ({
+    type: GAME_CHECK_COMPLETE
 });

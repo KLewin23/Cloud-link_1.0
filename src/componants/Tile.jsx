@@ -74,9 +74,50 @@ class Tile extends React.Component {
             });
         }
     }
-
     render() {
         const classes = this.props.classes;
+        const modify = () => {
+            switch (this.props.type){
+                case 'cloud':
+                    return (
+                        <GridListTileBar
+                            title={
+                                <span style={{ textTransform: "capitalize" }}>
+                            {this.props.title}
+                        </span>
+                            }
+                            subtitle={
+                                <span style={{ textTransform: "none" }}>
+                            {this.props.location}
+                        </span>
+                            }
+                        />
+                    )
+                case 'machine':
+                    return (
+                        <GridListTileBar
+                            title={
+                                <span style={{ textTransform: "capitalize" }}>
+                            {this.props.title}
+                        </span>
+                            }
+                            subtitle={
+                                <span style={{ textTransform: "none" }}>
+                            {this.props.location}
+                        </span>
+                            }
+                            actionIcon={
+                                <IconButton
+                                    className={classes.icon}
+                                    onClick={this.open}
+                                >
+                                    <InfoIcon />
+                                </IconButton>
+                            }
+                        />
+                    )
+            }
+        }
         return (
             <GridListTile
                 col={1}
@@ -84,26 +125,7 @@ class Tile extends React.Component {
                 className={classes.tile}
             >
                 {this.state.component}
-                <GridListTileBar
-                    title={
-                        <span style={{ textTransform: "capitalize" }}>
-                            {this.props.title}
-                        </span>
-                    }
-                    subtitle={
-                        <span style={{ textTransform: "none" }}>
-                            {this.props.location}
-                        </span>
-                    }
-                    actionIcon={
-                        <IconButton
-                            className={classes.icon}
-                            onClick={this.open}
-                        >
-                            <InfoIcon />
-                        </IconButton>
-                    }
-                />
+                {modify()}
             </GridListTile>
         );
     }
@@ -116,7 +138,7 @@ const styles = theme =>
             height: "275px"
         },
         tile: {
-            margin: "60px"
+            margin: "60px",
         },
         icon: {
             color: "rgba(255, 255, 255, 0.54)"

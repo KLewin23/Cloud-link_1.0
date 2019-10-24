@@ -13,6 +13,7 @@ import { GridList } from "@material-ui/core";
 
 function CloudTab(props) {
     const classes = props.classes;
+    const message = (props.google.clGamesFlag === 0) ? "Getting games from drive..." : "No Games Found."
     const games =
         JSON.stringify(props.google.clGames) !== '[]' &&
         JSON.stringify(props.google.clGames) !== 'undefined'
@@ -23,9 +24,10 @@ function CloudTab(props) {
                     title={game.name}
                     open={props.openModal}
                     location={'Cloud'}
+                    type={'cloud'}
                 />
             ))
-            : (<Typography variant={"h2"} style={{color: "white"}}>No Games Found.</Typography>);
+            : (<Typography variant={"h2"} style={{color: "white"}}>{message}</Typography>);
 
     return (
         <div style={{ margin: "auto" }}>

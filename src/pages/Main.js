@@ -97,6 +97,24 @@ function SimpleTabs(props) {
         }
     };
 
+    const addIcon = () => {
+        switch (value) {
+            case 0:
+                return "";
+            case 1:
+                return (
+                    <Tooltip title={"Add Game"}>
+                        <IconButton
+                            style={{ marginLeft: "20px" }}
+                            onClick={props.openAddGame}
+                        >
+                            <AddCircleOutline className={classes.settings} />
+                        </IconButton>
+                    </Tooltip>
+                );
+        }
+    };
+
     return (
         <div className={classes.root}>
             <Modal />
@@ -114,14 +132,7 @@ function SimpleTabs(props) {
                 </StyledTabs>
                 <div className={classes.controls}>
                     {icon()}
-                    <Tooltip title={"Add Game"}>
-                        <IconButton
-                            style={{ marginLeft: "20px" }}
-                            onClick={props.openAddGame}
-                        >
-                            <AddCircleOutline className={classes.settings} />
-                        </IconButton>
-                    </Tooltip>
+                    {addIcon()}
                     <Tooltip title={"Settings"}>
                         <IconButton style={{ marginLeft: "20px" }}>
                             <SettingsApplicationsSharp

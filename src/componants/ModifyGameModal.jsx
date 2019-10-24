@@ -44,36 +44,43 @@ class ModifyGameModal extends React.Component {
     }
 
     opened() {
-        this.props.unModified()
+        this.props.unModified();
         this.setState({ name: this.props.modal.currentGame });
         if (
             Object.keys(this.props.app.config.images).includes(
                 this.props.modal.currentGame
             )
         ) {
+
             new Promise((resolve, reject) => {
                 const image = ipcRenderer.sendSync(
                     "getImageRaw",
                     this.props.app.config.images[this.props.modal.currentGame]
                 );
+                const path = "data:image/png;base64,".concat(image)
                 resolve(
-                    '<img style="height: 200px" src="data:image/png;base64,' +
-                        image +
-                        '" />'
+                    <img style={{height: "200px"}} src={path}/>
                 );
             }).then(data => {
                 this.props.setModifiedImage(
-                    this.props.app.config.images[this.props.modal.currentGame]
+                    this.props.app.config.images
+                        [this.props.modal.currentGame]
                 );
-                const target = document.getElementById("modify-image");
-                target.insertAdjacentHTML("beforeend", data);
+                this.setState({
+                    component: (
+                        <div
+                            id={"modify-image"}
+                            style={{ marginRight: "90px", float: "left" }}
+                        >{data}</div>
+                    )
+                });
             });
         } else {
             this.setState({
                 component: (
                     <div
                         className={this.props.classes.imagePlaceholder}
-                        style={{ marginRight: "90px", float: "left" }}
+                        style={{ marginRight: "90px" }}
                     >
                         <Tooltip title={"Add Image"}>
                             <IconButton onClick={this.getImage}>
@@ -240,8 +247,7 @@ class ModifyGameModal extends React.Component {
                         marginLeft: "10px"
                     }}
                 />
-            );
-
+            )
         return (
             <Dialog
                 aria-labelledby="simple-modal-title"
@@ -255,6 +261,7 @@ class ModifyGameModal extends React.Component {
                     timeout: 500
                 }}
                 onEnter={this.opened}
+                id={"test"}
             >
                 <Fade in={open}>
                     <div className={classes.paper}>
@@ -277,12 +284,14 @@ class ModifyGameModal extends React.Component {
                                     value={this.state.name}
                                     onChange={e => {
                                         this.setState({ name: e.target.value });
-                                        if (e.target.value !== this.props.modal.currentGame){
+                                        if (
+                                            e.target.value !==
+                                            this.props.modal.currentGame
+                                        ) {
                                             this.props.makeModified();
                                         } else {
                                             this.props.unModified();
                                         }
-
                                     }}
                                     style={{ marginTop: "30px", width: "100%" }}
                                     InputLabelProps={{

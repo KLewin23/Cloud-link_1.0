@@ -4,7 +4,9 @@ import {
     UPLOADING_GAMES,
     UPLOAD_FINISHED,
     SET_CL_CONFIG_ID,
-    SET_CL_CONFIG, ADD_CL_GAMES
+    SET_CL_CONFIG,
+    ADD_CL_GAMES,
+    GAME_CHECK_COMPLETE
 } from "../types";
 
 const initialState = {
@@ -13,7 +15,8 @@ const initialState = {
     clUploading: false,
     clConfigId: "",
     clConfig: {},
-    clGames: []
+    clGames: [],
+    clGamesFlag: 0
 };
 
 export default (state = initialState, action) => {
@@ -34,7 +37,6 @@ export default (state = initialState, action) => {
                 clConfigId: action.payload
             };
         case SET_CL_CONFIG:
-            console.log(action.payload);
             return {
                 ...state,
                 clConfig: action.payload
@@ -55,6 +57,11 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 clGames: combined
+            };
+        case GAME_CHECK_COMPLETE:
+            return {
+                ...state,
+                clGamesFlag: 1
             };
         default:
             return state;

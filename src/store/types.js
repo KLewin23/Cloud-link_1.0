@@ -36,6 +36,7 @@ export const UPLOADING_GAMES = "UPLOADING_GAMES";
 export const SET_CL_CONFIG_ID = "SET_CL_CONFIG_ID";
 export const SET_CL_CONFIG = "SET_CL_CONFIG";
 export const ADD_CL_GAMES = "ADD_CL_GAMES";
+export const GAME_CHECK_COMPLETE = "GAME_CHECK_COMPLETE";
 
 // settings
 export const CHANGE_RATE = 'CHANGE_RATE';

@@ -1,6 +1,6 @@
 import request from "request";
 import store from '../../store'
-import {addGames} from "../../store/actions";
+import {addGames, clGameCheckComplete} from "../../store/actions";
 
 export default function getGoogleFolderChildren(token, auth, parent) {
     request.get(
@@ -25,6 +25,7 @@ export default function getGoogleFolderChildren(token, auth, parent) {
                         file.explicitlyTrashed === false
                 );
                 store.dispatch(addGames(children));
+                store.dispatch(clGameCheckComplete())
                 if(Object.keys(response.body).includes('nextPageToken')){
                     getGoogleFolderChildren(response.body.nextPageToken,auth,parent)
                 }

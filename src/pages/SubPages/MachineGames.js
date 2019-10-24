@@ -20,6 +20,7 @@ function MachineTab(props) {
                       title={game}
                       open={props.openModal}
                       location={props.games[game]}
+                      type={'machine'}
                   />
               ))
             : (<Typography variant={"h2"} style={{color: "white"}}>No Games Found.</Typography>);
