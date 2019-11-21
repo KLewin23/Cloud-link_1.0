@@ -20,7 +20,6 @@ class App extends React.Component {
         return (
 
             <div className="App">
-                xxy
                 {this.state.comp}
                 <Link to="/home">
                     <Button variant="contained">

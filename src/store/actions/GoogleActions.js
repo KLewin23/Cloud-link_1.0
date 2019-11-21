@@ -7,6 +7,8 @@ import {
     SET_CL_CONFIG,
     ADD_CL_GAMES,
     GAME_CHECK_COMPLETE,
+    DOWNLOADING_SAVES,
+    DOWNLOAD_FINISHED
 } from "../types";
 
 export const setClMainFolder = payload => ({
@@ -30,13 +32,19 @@ export const setClConfig = payload => ({
 });
 
 export const uploading = payload => ({
-    type: UPLOADING_GAMES,
-    payload
+    type: UPLOADING_GAMES
 });
 
 export const uploadComplete = payload => ({
-    type: UPLOAD_FINISHED,
-    payload
+    type: UPLOAD_FINISHED
+});
+
+export const downloadSaves = payload => ({
+    type: DOWNLOADING_SAVES
+});
+
+export const downloadFinished = payload => ({
+    type: DOWNLOAD_FINISHED
 });
 
 export const addGames = payload => ({

@@ -6,7 +6,6 @@ const username = require("os").userInfo().username;
 const driveList = require("drivelist");
 const fs = require("fs");
 const OAuth2Client = require("google-auth-library").OAuth2Client;
-const {google} = require('googleapis');
 const http = require("http");
 const destroyer = require("server-destroy");
 const fp = require("find-free-port");
@@ -216,10 +215,10 @@ ipcMain.on("archiveGame", (event, args) => {
     archive.pipe(output);
     archive.directory(args.path, args.game);
     archive.finalize();
-    output.on('close', function() {
-        console.log(archive.pointer() + ' total bytes');
+    output.on("close", function() {
+        console.log(archive.pointer() + " total bytes");
     });
-    event.returnValue = "success"
+    event.sender.send("gameArchived");
 });
 
 ipcMain.on("createFolderDrive", (event, args) => {
@@ -258,6 +257,7 @@ ipcMain.on("createFolderDrive", (event, args) => {
 });
 
 ipcMain.on("uploadFile", (event, args) => {
+    console.log("uploading");
     return new Promise((resolve, reject) => {
         request.post(
             "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable",
@@ -289,13 +289,60 @@ ipcMain.on("uploadFile", (event, args) => {
                         )
                     },
                     (err, res) => {
-                        if (err) throw err;
-                        event.returnValue = res;
+                        if (err) throw event.sender.send("uploadError");
+                        event.sender.send("uploadComplete");
                     }
                 );
             }
         );
     });
+});
+
+ipcMain.on("downloadFile", (event, { url, path, game, auth }) => {
+    request
+        .get(url, {
+            headers: {
+                Authorization: `Bearer ${auth}`
+            }
+        })
+        .on("response", function(response) {
+            //LOG THIS
+        })
+        .pipe(fs.createWriteStream(`${path}/${game}.zip`));
+    event.returnValue = "successrs#";
+});
+
+ipcMain.on("downloadFile2", (event, { path, games, auth }) => {
+    games.forEach(game => {
+        request.get(
+            `https://www.googleapis.com/drive/v2/files/${game.id}`,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${auth}`
+                },
+                json: true
+            },
+            (err, response) => {
+                if (err) throw err;
+                if (response.body.downloadUrl) {
+                    request
+                        .get(response.body.downloadUrl, {
+                            headers: {
+                                Authorization: `Bearer ${auth}`
+                            }
+                        })
+                        .on("response", function(response) {
+                            //LOG THIS
+                        })
+                        .pipe(fs.createWriteStream(`${path}/${game.name}.zip`));
+                } else {
+                    console.log(response.body);
+                }
+            }
+        );
+    })
+    event.returnValue = "success";
 });
 
 function getAuthenticatedUser() {

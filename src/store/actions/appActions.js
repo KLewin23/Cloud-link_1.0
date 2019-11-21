@@ -14,7 +14,8 @@ import {
     SET_IMAGE_CONFIG_PATH,
     ADD_NEW_GAME,
     SAVE_CONFIG,
-    CONFIG_ADD_IMAGE_PATH
+    CONFIG_ADD_IMAGE_PATH,
+    SET_TEMP_LOC_PATH
 
 } from "../types";
 
@@ -60,6 +61,11 @@ export const addGameConfig = payload => ({
 
 export const setConfigPath = payload => ({
     type: SET_CONFIG_FILE_PATH,
+    payload
+});
+
+export const setTempLocPath = payload => ({
+    type: SET_TEMP_LOC_PATH,
     payload
 });
 

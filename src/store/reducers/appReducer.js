@@ -14,7 +14,8 @@ import {
     SET_IMAGE_CONFIG_PATH,
     ADD_NEW_GAME,
     SAVE_CONFIG,
-    CONFIG_ADD_IMAGE_PATH
+    CONFIG_ADD_IMAGE_PATH,
+    SET_TEMP_LOC_PATH
 } from "../types";
 import { updateFile } from "../../scripts/ConfigHandler";
 import { GetUsername } from "../../scripts/Scanner";
@@ -24,7 +25,8 @@ const initialState = {
         filePath: "",
         imagePath: "",
         games: {},
-        images: {}
+        images: {},
+        tempLocPath: ""
     },
     fullscreen: 0,
     authKey: "",
@@ -139,6 +141,25 @@ export default (state = initialState, action) => {
                     filePath: action.payload
                 }
             };
+        case SET_TEMP_LOC_PATH:
+            updateFile(
+                {
+                    ...state,
+                    config: {
+                        ...state.config,
+                        tempLoc: action.payload
+                    }
+                },
+                GetUsername()
+            );
+            return {
+                ...state,
+                config: {
+                    ...state.config,
+                    tempLoc: action.payload
+                }
+            };
+
         case CHANGE_CONFIG_GAME_PATH:
             updateFile(
                 {

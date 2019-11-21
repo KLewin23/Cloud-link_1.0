@@ -19,6 +19,7 @@ class Tile extends React.Component {
             component: (
                 <div
                     id={this.props.id}
+                    style={{height: "275px"}}
                 />
             )
         };

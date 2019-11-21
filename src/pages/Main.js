@@ -18,14 +18,15 @@ import {
     AppBar,
     Tooltip
 } from "@material-ui/core";
-import { openAddGame, uploading } from "../store/actions";
+import { downloadSaves, openAddGame } from "../store/actions";
 import Modal from "../componants/AddGameModal";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
-import uploadSaves from "../scripts/functions/uploadSaves";
+import { upload } from "../store/actions/Upload";
 import { GetUsername } from "../scripts";
 import Snackbar from "../componants/Snackbar";
 import store from "../store";
+import DownloadAllSaves from "../scripts/functions/DownloadAllSaves";
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -74,13 +75,7 @@ function SimpleTabs(props) {
                     <Tooltip title={"Upload changes"}>
                         <IconButton
                             style={{ marginLeft: "20px" }}
-                            onClick={() => {
-                                uploadSaves(
-                                    props.app,
-                                    props.google,
-                                    GetUsername()
-                                );
-                            }}
+                            onClick={() => props.upload(GetUsername())}
                         >
                             <CloudUploadIcon className={classes.settings} />
                         </IconButton>
@@ -89,7 +84,12 @@ function SimpleTabs(props) {
             case 2:
                 return (
                     <Tooltip title={"Download changes"}>
-                        <IconButton style={{ marginLeft: "20px" }}>
+                        <IconButton
+                            style={{ marginLeft: "20px" }}
+                            onClick={() => {
+                                DownloadAllSaves(props.google, props.app);
+                            }}
+                        >
                             <CloudDownloadIcon className={classes.settings} />
                         </IconButton>
                     </Tooltip>
@@ -118,7 +118,14 @@ function SimpleTabs(props) {
     return (
         <div className={classes.root}>
             <Modal />
-            <Snackbar open={props.google.clUploading} />
+            <Snackbar
+                open={props.google.clUploading}
+                message={"Uploading Saves"}
+            />
+            <Snackbar
+                open={props.google.clDownloading}
+                message={"Downloading Saves"}
+            />
             <AppBar position="static" className={classes.appBar}>
                 <StyledTabs
                     value={value}
@@ -232,7 +239,9 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = {
-    openAddGame
+    openAddGame,
+    downloadSaves,
+    upload
 };
 export default connect(
     mapStateToProps,

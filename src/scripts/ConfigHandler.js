@@ -7,14 +7,14 @@ import {
     setClGamesFolder,
     setClMainFolder,
     setClConfigId,
-    setClConfig
+    setClConfig, setTempLocPath
 } from "../store/actions";
 import CheckFileExistance from "./functions/CheckFileExistance";
 import request from "request";
 import DriveConfig from "../Config/DefaultDriveConfig";
 import { GetUsername } from "../scripts/Scanner";
-import getGoogleFileContents from "./functions/getGoogleFileContents";
-import getGoogleFolderChildren from "./functions/getGoogleFolderChildren";
+import getGoogleFileContents from "./functions/GetGoogleFileContents";
+import getGoogleFolderChildren from "./functions/GetGoogleFolderChildren";
 const { ipcRenderer } = window.require("electron");
 
 export function ConfigMain(app, username) {
@@ -53,22 +53,24 @@ export function ConfigMain(app, username) {
             configPath: "/Users/UNAME/Library/Application Support/Cloud-link/config.json".replace(
                 "UNAME",
                 username
+            ),
+            tempLoc: "/Users/UNAME/Library/Application Support/Cloud-link/files/temp".replace(
+                "UNAME",
+                username
             )
         }
     };
     const osPaths = paths[app.os];
     if (CheckFileExistance(osPaths.files) !== "exists") {
         if (ipcRenderer.sendSync("createFolder", osPaths.files) !== "success") {
-            alert(
-                `Error: ${osPaths.files} not created... this will cause issues`
-            );
+            CreationError(osPaths.files)
         }
     }
     ["localArchives", "driveArchives"].forEach(name => {
         const dirPath = osPaths.gameDir.replace("GAMENAME", name);
         if (CheckFileExistance(dirPath) !== "exists") {
             if (ipcRenderer.sendSync("createFolder", dirPath) !== "success") {
-                alert(`Error: ${dirPath} not created this will cause issues`);
+                CreationError(dirPath)
             }
         }
     });
@@ -79,9 +81,7 @@ export function ConfigMain(app, username) {
                 contents: JSON.stringify(DriveConfig)
             }) !== "success"
         ) {
-            alert(
-                `Error: ${osPaths.driveConfig} not created this will cause issues`
-            );
+            CreationError(osPaths.driveConfig)
         }
     }
     if (CheckFileExistance(osPaths.configPath) !== "exists") {
@@ -97,6 +97,15 @@ export function ConfigMain(app, username) {
         store.dispatch(setBaseConfig(config));
         reduxComparison(app, config);
     }
+    if (CheckFileExistance(osPaths.tempLoc) !== "exists") {
+        if (ipcRenderer.sendSync( "createFolder", osPaths.tempLoc) !== "success") {
+            CreationError(osPaths.tempLoc)
+        } else {
+            store.dispatch(setTempLocPath(osPaths.tempLoc))
+        }
+    } else {
+        store.dispatch(setTempLocPath(osPaths.tempLoc))
+    }
     imageConfigMain(app, username);
     getCloudConfig(app, username);
 }
@@ -106,6 +115,12 @@ export function updateFile(app, username) {
         name: app.config.filePath,
         contents: JSON.stringify(app.config)
     });
+}
+
+function CreationError(item){
+    alert(
+        `Error: ${item} not created this will cause issues`
+    )
 }
 
 function reduxComparison(app, config) {

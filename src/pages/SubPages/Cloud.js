@@ -5,7 +5,7 @@ import Typography from "@material-ui/core/Typography";
 import { openModal } from "../../store/actions";
 import { connect } from "react-redux";
 import request from "request";
-import getGoogleFolderChildren from "../../scripts/functions/getGoogleFolderChildren";
+import getGoogleFolderChildren from "../../scripts/functions/GetGoogleFolderChildren";
 import Modal from "../../componants/ModifyGameModal";
 import { GridList } from "@material-ui/core";
 
