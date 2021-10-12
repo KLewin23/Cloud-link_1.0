@@ -23,7 +23,7 @@
     "extends": "react-app"
   },
   "devDependencies": {
-    "electron": "^6.0.4",
+    "electron": "^11.5.0",
     "electron-builder": "^21.2.0",
     "nodemon": "^1.19.1"
   },
